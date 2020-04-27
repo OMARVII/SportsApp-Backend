@@ -3,7 +3,7 @@ import * as bodyParser from 'body-parser';
 import * as mongoose from 'mongoose';
 import IController from './interfaces/IController';
 import * as cookieParser from 'cookie-parser';
-import errorMiddleware from './middlewares/errorMiddleware';
+import errorMiddleware from './middlewares/ErrorMiddleware';
 import * as swaggerUi from 'swagger-ui-express';
 import * as swaggerDocument from '../swagger.json';
 
