@@ -3,13 +3,14 @@ import IUser from '../interfaces/user/IUser';
 
 
 const baseOptions = {
-    discriminatorKey: 'role',
-    collection: 'User',
     timestamps: true
 };
 
 const userSchema = new mongoose.Schema({
-    fullName: String,
+    fullName: {
+        type:String,
+        required:true
+    },
     birthDate: {
         day: {
             type: Number,
@@ -33,17 +34,11 @@ const userSchema = new mongoose.Schema({
         type: String,
     },
     mobile: {
-        type: String
-    },
-    isApproved: {
-        type: Boolean,
-        default: false
-    },
-    verificationToken: {
-        type: String
+        type: String,
+        required:true
     }
 }, baseOptions);
 
-const userModel = mongoose.model<IUser>('User', userSchema);
+const userModel = mongoose.model<IUser>('users', userSchema);
 
 export default userModel;

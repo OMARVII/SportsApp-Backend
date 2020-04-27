@@ -11,6 +11,5 @@ interface IUser extends Document {
     };
     gender: string;
     mobile: string;
-    picture: string;
 }
 export default IUser;
