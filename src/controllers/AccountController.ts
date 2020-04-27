@@ -45,6 +45,9 @@ class AccountController implements IController {
                     const token = this.tokenManager.getToken({ _id: user._id });
                     response.status(200).send(new Response('Login success', { token }).getData());
                 }
+                else{
+                    next(new WrongCredentialsException());
+                }
             }
             catch {
                 next(new WrongCredentialsException());
