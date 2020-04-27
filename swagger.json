@@ -36,14 +36,13 @@
         "application/json"
     ],
     "paths": {
-        "/api/Client/Login": {
+        "/api/Account/Login": {
             "post": {
                 "tags": [
-                    "Client"
+                    "Account"
                 ],
                 "summary": "Gets A Token for client",
                 "requestBody": {
-                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
@@ -79,10 +78,10 @@
                 }
             }
         },
-        "/api/Client/Register": {
+        "/api/Account/Register": {
             "post": {
                 "tags": [
-                    "Client"
+                    "Account"
                 ],
                 "summary": "Registers Client to the database",
                 "requestBody": {
@@ -98,10 +97,9 @@
                     "201": {
                         "description": "Registered Successfully",
                         "content": {
-                            "text/plain": {
+                            "application/json": {
                                 "schema": {
-                                    "type": "string",
-                                    "example": "Registered Successfully"
+                                    "$ref": "#/definitions/Token"
                                 }
                             }
                         }
@@ -209,7 +207,7 @@
         "ClientRegistration": {
             "type": "object",
             "properties": {
-                "name": {
+                "fullName": {
                     "type": "string"
                 },
                 "mobile": {
