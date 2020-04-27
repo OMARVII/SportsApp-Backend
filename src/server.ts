@@ -1,7 +1,7 @@
 import App from './app';
 import "../bin/dev"
-import { validateEnv } from './utils/validateEnv';
-import AccountController from './controllers/accountController';
+import { validateEnv } from './utils/ValidateEnv';
+import AccountController from './controllers/AccountController';
 
 
 validateEnv();
