@@ -4,8 +4,7 @@ export default class TokenManager {
     constructor(){
         this.secret = process.env.JWT_SECRET;
     }
-    public getToken(data){
-        console.log("YABA");
+    public getToken(data={}){
         return jwt.sign(data,this.secret)
     }
     public validateToken(token:any):Promise<any>{

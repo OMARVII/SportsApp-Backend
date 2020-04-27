@@ -25,29 +25,31 @@ class AccountController implements IController {
     constructor() {
         this.path = '/Account';
         this.router = express.Router();
+        this.tokenManager = new TokenManager();
         this.initializeRoutes();
     }
     private initializeRoutes() {
         this.router.post(`${this.path}/Login`, validationMiddleware(LogInDto), this.login);
-        this.router.post(`${this.path}/Register`, validationMiddleware(RegisterDTO),this.register);
+        this.router.post(`${this.path}/Register`, validationMiddleware(RegisterDTO), this.register);
     }
     private login = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         const logInData: LogInDto = request.body;
-        await userModel.findOne({ email: logInData.email },async (err,user:IUser)=>{
-            if(err){
-                next(new SomethingWentWrongException());   
+        await userModel.findOne({ email: logInData.email }, async (err, user: IUser) => {
+            if (err) {
+                next(new SomethingWentWrongException());
             }
-            else{
+            try {
                 const isPasswordMatching = await bcrypt.compare(logInData.password, user.password);
-            if (isPasswordMatching) {
-                user.password = undefined;
-                const token = this.tokenManager.getToken({ _id: user._id });
-                response.status(200).send(new Response('Login success', { token }).getData());
+                if (isPasswordMatching) {
+                    user.password = undefined;
+                    const token = this.tokenManager.getToken({ _id: user._id });
+                    response.status(200).send(new Response('Login success', { token }).getData());
+                }
             }
-            else {
+            catch {
                 next(new WrongCredentialsException());
             }
-            }
+
         });
     }
     private register = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
@@ -67,10 +69,10 @@ class AccountController implements IController {
                     }
                     else {
                         user.password = undefined;
-                        
+
                         const token = this.tokenManager.getToken({ _id: user._id });
-                        response.status(200).send(new Response('Registered successfully', { token }).getData());
-                
+                        response.status(201).send(new Response('Registered successfully', { token }).getData());
+
                     }
                 });
             }
