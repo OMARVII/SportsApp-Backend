@@ -36,6 +36,45 @@
         "application/json"
     ],
     "paths": {
+        "/api/Account/ValidateToken": {
+            "get": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Validates Token in authorization header",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "type": "object",
+                                            "properties": {
+                                                "result": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/Account/Login": {
             "post": {
                 "tags": [
