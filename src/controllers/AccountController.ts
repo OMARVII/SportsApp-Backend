@@ -1,12 +1,14 @@
 import * as express from 'express';
 import * as bcrypt from 'bcrypt';
 /////////////////////////////////////////
-import userModel from './../model/User';
+import userModel from '../models/User';
 /////////////////////////////////////////
 import IController from '../interfaces/IController';
 import IUser from '../interfaces/user/IUser';
+import IRequestWithUser from '../interfaces/IRequestWithUser';
 /////////////////////////////////////////
 import validationMiddleware from '../middlewares/ValidationMiddleware';
+import authMiddleware from '../middlewares/auth';
 ////////////////////////////////////////
 import LogInDto from './../dto/LoginDTO';
 import RegisterDTO from './../dto/RegisterDTO';
@@ -29,8 +31,13 @@ class AccountController implements IController {
         this.initializeRoutes();
     }
     private initializeRoutes() {
+        this.router.get(`${this.path}/ValidateToken`, authMiddleware, this.validateToken);
+        ///////////////////////////////////////////////////////////////////////////////////
         this.router.post(`${this.path}/Login`, validationMiddleware(LogInDto), this.login);
         this.router.post(`${this.path}/Register`, validationMiddleware(RegisterDTO), this.register);
+    }
+    private validateToken = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
+        response.status(200).send(new Response(undefined, { result: true }).getData());
     }
     private login = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         const logInData: LogInDto = request.body;
