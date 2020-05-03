@@ -36,12 +36,12 @@ class AccountController implements IController {
         this.router.post(`${this.path}/Login`, validationMiddleware(LogInDto), this.login);
         this.router.post(`${this.path}/Register`, validationMiddleware(RegisterDTO), this.register);
     }
-    private validateToken = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
+    private validateToken = async (quest: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         response.status(200).send(new Response(undefined, { result: true }).getData());
     }
     private login = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         const logInData: LogInDto = request.body;
-        await userModel.findOne({ email: logInData.email }, async (err, user: IUser) => {
+        await userModel.findOne({ email: logInData.email.toLowerCase() }, async (err, user: IUser) => {
             if (err) {
                 next(new SomethingWentWrongException());
             }
@@ -64,7 +64,7 @@ class AccountController implements IController {
     }
     private register = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         const userData: RegisterDTO = request.body;
-        if (await userModel.findOne({ email: userData.email })) {
+        if (await userModel.findOne({ email: userData.email.toLowerCase() })) {
             next(new UserWithThatEmailAlreadyExistsException(userData.email));
         }
         else {
