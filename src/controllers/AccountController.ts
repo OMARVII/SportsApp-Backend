@@ -9,6 +9,7 @@ import IRequestWithUser from '../interfaces/IRequestWithUser';
 /////////////////////////////////////////
 import validationMiddleware from '../middlewares/ValidationMiddleware';
 import authMiddleware from '../middlewares/auth';
+import {ImgUpload} from '../middlewares/Upload';
 ////////////////////////////////////////
 import LogInDto from './../dto/LoginDTO';
 import RegisterDTO from './../dto/RegisterDTO';
@@ -19,7 +20,7 @@ import Response from './../modules/Response';
 import WrongCredentialsException from './../exceptions/WrongCredentialsException';
 import UserWithThatEmailAlreadyExistsException from '../exceptions/UserWithThatEmailAlreadyExistsException';
 import SomethingWentWrongException from './../exceptions/SomethingWentWrongException';
-
+  
 class AccountController implements IController {
     public path: string;
     public router: express.IRouter;
