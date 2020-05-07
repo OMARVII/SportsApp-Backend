@@ -3,6 +3,8 @@ import "../bin/dev"
 import { validateEnv } from './utils/ValidateEnv';
 import AccountController from './controllers/AccountController';
 import ClassController from './controllers/ClassController'
+import AnnouncementController from './controllers/AnnouncementController'
+
 
 validateEnv();
 
@@ -10,7 +12,8 @@ validateEnv();
 const app = new App(
     [
         new AccountController(),
-        new ClassController()
+        new ClassController(),
+        new AnnouncementController()
     ]
 );
 
