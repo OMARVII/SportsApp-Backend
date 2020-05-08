@@ -9,6 +9,14 @@
         {
             "name": "Account",
             "description": "API for Account Managment in the system"
+        },
+        {
+            "name": "Class",
+            "description": "Class Controller"
+        },
+        {
+            "name": "Announcenment",
+            "description": "Announcenment Controller"
         }
     ],
     "schemes": [
@@ -30,7 +38,8 @@
         }
     ],
     "consumes": [
-        "application/json"
+        "application/json",
+        "multipart/form-data"
     ],
     "produces": [
         "application/json"
@@ -175,6 +184,237 @@
                     }
                 }
             }
+        },
+        "/api/Class": {
+            "post": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "Creates New Class",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/definitions/AddClass"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created Class Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Added Class Successfully"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/{id}": {
+            "get": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "gets Class with passed id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Class Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "$ref": "#/definitions/Class"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/Like/{id}": {
+            "put": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "Like Or Dislike Class with passed id",
+                "description": "Set The status value in request body to true to like and false to dislike the class",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "status": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Announcement": {
+            "post": {
+                "tags": [
+                    "Announcement"
+                ],
+                "summary": "Creates New Announcement",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/definitions/AddAnnouncement"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Announcement Created Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Added Announcement Successfully"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Announcement/AllAnnouncements": {
+            "get": {
+                "tags": [
+                    "Announcement"
+                ],
+                "summary": "Gets all Announcement",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/AllAnnouncements"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -188,6 +428,27 @@
                 "message": {
                     "type": "string",
                     "example": "Something Went Wrong"
+                }
+            }
+        },
+        "AddClass": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "level": {
+                    "type": "string"
+                },
+                "place": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "classImage": {
+                    "type": "string",
+                    "format": "binary"
                 }
             }
         },
@@ -209,25 +470,36 @@
             "type": "string",
             "example": "Unauthorized Account"
         },
-        "FullAccount": {
+        "Class": {
             "type": "object",
             "properties": {
                 "name": {
                     "type": "string"
                 },
-                "mobile": {
+                "level": {
                     "type": "string"
                 },
-                "email": {
+                "place": {
                     "type": "string"
                 },
-                "isApproved": {
+                "type": {
                     "type": "boolean"
                 },
-                "_id": {
-                    "type": "string"
+                "likes": {
+                    "type": "object",
+                    "properties": {
+                        "numberOfLikes": {
+                            "type": "number"
+                        },
+                        "users": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 },
-                "gender": {
+                "imageLocation": {
                     "type": "string"
                 }
             }
@@ -257,6 +529,56 @@
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "AddAnnouncement": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "publishedDateTime": {
+                    "type": "string"
+                },
+                "dueDate": {
+                    "type": "string"
+                },
+                "termsConditions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "announcementImage": {
+                    "type": "string",
+                    "format": "binary"
+                }
+            }
+        },
+        "AllAnnouncements": {
+            "type": "object",
+            "properties": {
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "type": "string"
+                            },
+                            "publishedDateTime": {
+                                "type": "string"
+                            },
+                            "announcementImage": {
+                                "type": "string",
+                                "format": "binary"
+                            }
+                        }
+                    }
                 }
             }
         }

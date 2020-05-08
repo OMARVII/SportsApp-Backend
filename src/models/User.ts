@@ -36,7 +36,11 @@ const userSchema = new mongoose.Schema({
     mobile: {
         type: String,
         required:true
-    }
+    },
+    likedClasses:[{
+        ref: 'class',
+        type: mongoose.Schema.Types.ObjectId
+    }]
 }, baseOptions);
 
 const userModel = mongoose.model<IUser>('users', userSchema);
