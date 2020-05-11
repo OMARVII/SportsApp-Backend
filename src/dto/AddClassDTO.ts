@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString,IsDateString } from 'class-validator';
 
 class AddClassDTO {
   @IsString()
@@ -12,6 +12,14 @@ class AddClassDTO {
   
   @IsString()
   public type: string;
+  
+  
+  @IsString()
+  public  description : string;
+  
+  @IsDateString()
+  public  date : Date;
+  
   
 }
 

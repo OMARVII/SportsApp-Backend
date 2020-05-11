@@ -12,5 +12,6 @@ interface IUser extends Document {
     gender: string;
     mobile: string;
     likedClasses:string[];
+    reservedClasses:string[];
 }
 export default IUser;

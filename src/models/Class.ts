@@ -16,6 +16,10 @@ const classSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    description:{
+        type:String,
+        required:true
+    },
     place:{
         type: String,
         required: true
@@ -24,17 +28,19 @@ const classSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    likes: {
-       numberOfLikes:{
-           type:Number,
-           default:0
-       },
-       users:[{
-            ref: 'users',
-            type: mongoose.Schema.Types.ObjectId
-        }]
+    date:{
+        type:Date,
+        required:true
     },
-    imageLocation:{
+    numberOfLikes:{
+        type:Number,
+       default:0
+    },
+    likedUsers:[{
+        ref: 'users',
+        type: mongoose.Schema.Types.ObjectId
+    }],
+    imageURL:{
         type:String,
         required:true
     }

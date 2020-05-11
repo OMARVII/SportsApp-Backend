@@ -5,10 +5,8 @@ interface IClass extends Document {
     level: string;
     place: string;
     type:string;
-    likes: {
-        numberOfLikes:number,
-        users:string[]
-    };
-    imageLocation:string;
+    numberOfLikes:number;
+    likedUsers:string[];
+    imageURL:string;
 }
 export default IClass;
