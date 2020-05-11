@@ -15,7 +15,7 @@
             "description": "Class Controller"
         },
         {
-            "name": "Announcenment",
+            "name": "Announcement",
             "description": "Announcenment Controller"
         }
     ],
@@ -260,6 +260,47 @@
                                     "properties": {
                                         "payload": {
                                             "$ref": "#/definitions/Class"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/AllClasses": {
+            "get": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "gets all Classes",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Classes Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "type":"array",
+                                            "items":{
+                                                "$ref": "#/definitions/Class"
+                                            }
                                         }
                                     }
                                 }

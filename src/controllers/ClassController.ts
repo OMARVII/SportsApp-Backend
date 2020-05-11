@@ -26,17 +26,26 @@ class ClassController implements IController {
         this.initializeRoutes();
     }
     private initializeRoutes() {
-        this.router.get(`${this.path}/:id`,authMiddleware,this.getClass);
+        this.router.get(`${this.path}/AllClasses`,authMiddleware,this.getAllClasses);
         //////////////////////////////////////////////////////////////////////////////////
         this.router.post(`${this.path}`, ImgUpload.single('classImage'),validationMiddleware(AddClassDTO),this.addClass);
         //////////////////////////////////////////////////////////////////////////////////
         this.router.put(`${this.path}/Like/:id`,authMiddleware, this.like);   
+        ////////////////////////////////////////////////////////////////////////////
+        this.router.get(`${this.path}/:id`,authMiddleware,this.getClass);
     }
     private getClass = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         const _id = request.params.id;
        await classModel
        .findById(_id,'-__v -createdAt -updatedAt')
        .then((classObj:IClass)=>{
+        response.status(200).send(new Response(undefined,classObj).getData());
+       })
+    }
+    private getAllClasses = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
+       await classModel
+       .find({},'-__v -createdAt -updatedAt')
+       .then((classObj:IClass[])=>{
         response.status(200).send(new Response(undefined,classObj).getData());
        })
     }
