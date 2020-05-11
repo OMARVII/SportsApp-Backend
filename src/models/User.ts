@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
     likedClasses:[{
         ref: 'class',
         type: mongoose.Schema.Types.ObjectId
+    }],
+    reservedClasses:[{
+        ref: 'class',
+        type: mongoose.Schema.Types.ObjectId
     }]
 }, baseOptions);
 

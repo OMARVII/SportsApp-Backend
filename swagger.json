@@ -478,6 +478,13 @@
                 "name": {
                     "type": "string"
                 },
+                "description":{
+                    "type":"string"
+                },
+                "date":{
+                    "type":"string",
+                    "format":"date-time"
+                },
                 "level": {
                     "type": "string"
                 },
@@ -517,6 +524,16 @@
                 "name": {
                     "type": "string"
                 },
+                "_id":{
+                    "type":"string"
+                },
+                "date":{
+                    "type":"string",
+                    "format":"date-time"
+                },
+                "description":{
+                    "type":"string"
+                },
                 "level": {
                     "type": "string"
                 },
@@ -524,24 +541,16 @@
                     "type": "string"
                 },
                 "type": {
-                    "type": "boolean"
-                },
-                "likes": {
-                    "type": "object",
-                    "properties": {
-                        "numberOfLikes": {
-                            "type": "number"
-                        },
-                        "users": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                },
-                "imageLocation": {
                     "type": "string"
+                },
+                "numberOfLikes": {
+                    "type": "number"
+                },
+                "imageURL": {
+                    "type": "string"
+                },
+                "isLiked":{
+                    "type":"boolean"
                 }
             }
         },
