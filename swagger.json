@@ -1361,18 +1361,23 @@
             "type": "object",
             "properties": {
                 "payload": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "place": {
-                                "type": "string"
-                            },
-                            "latitude": {
-                                "type": "string"
-                            },
-                            "longitude": {
-                                "type": "string"
+                    "type": "object",
+                    "properties": {
+                        "branches": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "place": {
+                                        "type": "string"
+                                    },
+                                    "latitude": {
+                                        "type": "string"
+                                    },
+                                    "longitude": {
+                                        "type": "string"
+                                    }
+                                }
                             }
                         }
                     }
