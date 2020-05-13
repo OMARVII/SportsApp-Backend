@@ -1,15 +1,17 @@
 import * as mongoose from 'mongoose';
-import IUser from '../interfaces/user/IUser';
+import IUser from '../../interfaces/user/IUser';
 
 
 const baseOptions = {
+    discriminatorKey: 'role',
+    collection: 'users',
     timestamps: true
 };
 
 const userSchema = new mongoose.Schema({
     fullName: {
-        type:String,
-        required:true
+        type: String,
+        required: true
     },
     birthDate: {
         day: {
@@ -35,18 +37,11 @@ const userSchema = new mongoose.Schema({
     },
     mobile: {
         type: String,
-        required:true
+        required: true
     },
-    likedClasses:[{
-        ref: 'class',
-        type: mongoose.Schema.Types.ObjectId
-    }],
-    reservedClasses:[{
-        ref: 'class',
-        type: mongoose.Schema.Types.ObjectId
-    }]
+
 }, baseOptions);
 
-const userModel = mongoose.model<IUser>('users', userSchema);
-
+const userModel = mongoose.model<IUser>('user', userSchema);
+ 
 export default userModel;

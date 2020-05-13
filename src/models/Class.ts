@@ -13,8 +13,9 @@ const classSchema = new mongoose.Schema({
         unique:true
     },
     level: {
-        type:String,
-        required:true
+        ref:'ClassLevel',
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
     },
     description:{
         type:String,
@@ -25,7 +26,8 @@ const classSchema = new mongoose.Schema({
         required: true
     },
     type: {
-        type: String,
+        ref:'Class Type',
+        type: mongoose.Schema.Types.ObjectId,
         required: true
     },
     date:{
@@ -34,8 +36,12 @@ const classSchema = new mongoose.Schema({
     },
     numberOfLikes:{
         type:Number,
-       default:0
+        default:0
     },
+    users:[{
+        ref: 'users',
+        type: mongoose.Schema.Types.ObjectId
+    }],
     likedUsers:[{
         ref: 'users',
         type: mongoose.Schema.Types.ObjectId
@@ -43,9 +49,24 @@ const classSchema = new mongoose.Schema({
     imageURL:{
         type:String,
         required:true
-    }
+    },
+    ratings:[{
+        rate:{
+            type:Number
+        },
+        feedback:{
+            type:String
+        }
+    }]
 }, baseOptions);
+// classSchema.pre("remove",function(callback){
+//     this.model('users')
+//     .update({_id:{$in: this.users}},
+//         {$pull: {groups: this._id}}, 
+//         {multi: true},
+//         callback)
+// });
 
-const classModel = mongoose.model<IClass>('class', classSchema);
+const classModel = mongoose.model<IClass>('Class', classSchema);
 
 export default classModel;
