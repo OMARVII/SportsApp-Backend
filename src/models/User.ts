@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    profilePicture:{
+        type:String,
+        default:"https://sports-app-bucket.s3.eu-west-3.amazonaws.com/profilePictureTemplate.png"
+    },
     birthDate: {
         day: {
             type: Number,
@@ -44,9 +48,13 @@ const userSchema = new mongoose.Schema({
     reservedClasses:[{
         ref: 'class',
         type: mongoose.Schema.Types.ObjectId
+    }],
+    history:[{
+        ref: 'class',
+        type: mongoose.Schema.Types.ObjectId
     }]
 }, baseOptions);
 
-const userModel = mongoose.model<IUser>('users', userSchema);
+const userModel = mongoose.model<IUser>('User', userSchema);
 
 export default userModel;

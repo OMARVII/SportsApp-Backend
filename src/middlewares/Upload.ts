@@ -8,6 +8,14 @@ const s3 = new aws.S3({
     secretAccessKey: process.env.secretAccessKey
    });
 
+export const deleteFile = (key:string) =>{
+  return s3.deleteObject({
+    Bucket: 'sports-app-bucket',
+    Key: key
+  },function (err,data){
+    err? false:true
+  })
+} 
 export const ImgUpload = multer({
     storage: multerS3({
      s3: s3,
@@ -22,7 +30,7 @@ export const ImgUpload = multer({
      checkFileType( file, cb );
     }
    });
-
+   
    function checkFileType( file:Express.Multer.File, cb:any ){
     // Allowed ext
     const filetypes = /jpeg|jpg|png|gif/;

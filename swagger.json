@@ -87,7 +87,7 @@
         "/api/Account/Login": {
             "post": {
                 "tags": [
-                    "Account"
+                    "Account" 
                 ],
                 "summary": "Gets A Token for client",
                 "requestBody": {
@@ -233,6 +233,290 @@
                 }
             }
         },
+        "/api/Class/AddClassType":{
+            "post": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "Creates New Class Type",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/AddClassType"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created Class type Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Added Class type Successfully"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/AddClassLevel":{
+            "post": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "Creates New Class Level",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/AddClassLevel"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created Class level Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Added Class level Successfully"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/ReserveClass": {
+            "post": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "Reserves Class",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type":"object",
+                                "properties":{
+                                    "id":{
+                                        "type":"string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reserved Class Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Reserved Class Successfully"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/CancelClassReservation": {
+            "post": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "Reserves Class",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type":"object",
+                                "properties":{
+                                    "id":{
+                                        "type":"string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Canceled Reservation Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Canceled Class Reservation Successfully"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/ClassLevels":{
+            "get": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "gets all Class Levels",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Class Levels Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "type":"array",
+                                            "items":{
+                                                "$ref": "#/definitions/ClassLevel"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/ClassTypes":{
+            "get": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "gets all Class Types",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Class Types Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "type":"array",
+                                            "items":{
+                                                "$ref": "#/definitions/ClassType"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/Class/{id}": {
             "get": {
                 "tags": [
@@ -285,6 +569,88 @@
                     "Class"
                 ],
                 "summary": "gets all Classes",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Classes Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "type":"array",
+                                            "items":{
+                                                "$ref": "#/definitions/Class"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/ReservedClasses": {
+            "get": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "gets all user reserved classes",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Classes Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "type":"array",
+                                            "items":{
+                                                "$ref": "#/definitions/Class"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/FavouriteClasses": {
+            "get": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "gets all user liked Classes",
                 "produces": [
                     "application/json"
                 ],
@@ -472,6 +838,22 @@
                 }
             }
         },
+        "AddClassLevel":{
+            "type":"object",
+            "properties":{
+                "name":{
+                    "type":"string"
+                }
+            }
+        },
+        "AddClassType":{
+            "type":"object",
+            "properties":{
+                "name":{
+                    "type":"string"
+                }
+            }
+        },  
         "AddClass": {
             "type": "object",
             "properties": {
@@ -486,17 +868,41 @@
                     "format":"date-time"
                 },
                 "level": {
-                    "type": "string"
+                    "type": "string",
+                    "description":"reference ObjectID of the class level"
                 },
                 "place": {
                     "type": "string"
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "description":"reference ObjectID of the class type"
                 },
                 "classImage": {
                     "type": "string",
                     "format": "binary"
+                }
+            }
+        },
+        "ClassLevel":{
+            "type": "object",
+            "properties": {
+                "_id":{
+                    "type":"string"
+                },
+                "name":{
+                    "type":"string"
+                }
+            }
+        },
+        "ClassType":{
+            "type": "object",
+            "properties": {
+                "_id":{
+                    "type":"string"
+                },
+                "name":{
+                    "type":"string"
                 }
             }
         },
