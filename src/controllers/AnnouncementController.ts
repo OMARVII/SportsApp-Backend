@@ -31,12 +31,12 @@ class AnnouncementController implements IController {
 
     }
     private getAllAnnouncements = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-        await announcementModel.find({}, '-_id -createdAt -updatedAt -__v -description -dueDate -termsConditions', (err, categories) => {
+        await announcementModel.find({}, '-_id -createdAt -updatedAt -__v -description -dueDate -termsConditions', (err, announcements) => {
             if (err) {
                 next(new SomethingWentWrongException());
             }
             else {
-                response.status(200).send(new Response(undefined, { categories }).getData());
+                response.status(200).send(new Response(undefined, { announcements }).getData());
             }
         })
     }
