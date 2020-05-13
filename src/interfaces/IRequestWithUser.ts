@@ -1,8 +1,8 @@
 import { Request } from 'express';
-import IUser from './user/IUser';
+import IClient from './user/IClient';
  
 interface IRequestWithUser extends Request {
-  user: IUser;
+  user: IClient;
 }
  
 export default IRequestWithUser;

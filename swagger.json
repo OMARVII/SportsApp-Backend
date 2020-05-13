@@ -87,7 +87,7 @@
         "/api/Account/Login": {
             "post": {
                 "tags": [
-                    "Account" 
+                    "Account"
                 ],
                 "summary": "Gets A Token for client",
                 "requestBody": {
@@ -185,6 +185,126 @@
                 }
             }
         },
+        "/api/Admin/Login": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Gets A Token for Admin",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/Account"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Token"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Incorrect Email or Password",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Admin/Register": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Register Admin to the database",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/ClientRegistration"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Registered Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Token"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Email Already Exists",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid User Role",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Account/getProfileData": {
+            "get": {
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Gets all the data of the currently logged in client",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/ClientInformation"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/Class": {
             "post": {
                 "tags": [
@@ -233,7 +353,7 @@
                 }
             }
         },
-        "/api/Class/AddClassType":{
+        "/api/Class/AddClassType": {
             "post": {
                 "tags": [
                     "Class"
@@ -281,7 +401,7 @@
                 }
             }
         },
-        "/api/Class/AddClassLevel":{
+        "/api/Class/AddClassLevel": {
             "post": {
                 "tags": [
                     "Class"
@@ -339,10 +459,10 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "type":"object",
-                                "properties":{
-                                    "id":{
-                                        "type":"string"
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string"
                                     }
                                 }
                             }
@@ -392,10 +512,10 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "type":"object",
-                                "properties":{
-                                    "id":{
-                                        "type":"string"
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string"
                                     }
                                 }
                             }
@@ -435,7 +555,7 @@
                 }
             }
         },
-        "/api/Class/ClassLevels":{
+        "/api/Class/ClassLevels": {
             "get": {
                 "tags": [
                     "Class"
@@ -453,8 +573,8 @@
                                     "type": "object",
                                     "properties": {
                                         "payload": {
-                                            "type":"array",
-                                            "items":{
+                                            "type": "array",
+                                            "items": {
                                                 "$ref": "#/definitions/ClassLevel"
                                             }
                                         }
@@ -476,7 +596,7 @@
                 }
             }
         },
-        "/api/Class/ClassTypes":{
+        "/api/Class/ClassTypes": {
             "get": {
                 "tags": [
                     "Class"
@@ -494,8 +614,8 @@
                                     "type": "object",
                                     "properties": {
                                         "payload": {
-                                            "type":"array",
-                                            "items":{
+                                            "type": "array",
+                                            "items": {
                                                 "$ref": "#/definitions/ClassType"
                                             }
                                         }
@@ -581,8 +701,8 @@
                                     "type": "object",
                                     "properties": {
                                         "payload": {
-                                            "type":"array",
-                                            "items":{
+                                            "type": "array",
+                                            "items": {
                                                 "$ref": "#/definitions/Class"
                                             }
                                         }
@@ -622,8 +742,8 @@
                                     "type": "object",
                                     "properties": {
                                         "payload": {
-                                            "type":"array",
-                                            "items":{
+                                            "type": "array",
+                                            "items": {
                                                 "$ref": "#/definitions/Class"
                                             }
                                         }
@@ -663,8 +783,8 @@
                                     "type": "object",
                                     "properties": {
                                         "payload": {
-                                            "type":"array",
-                                            "items":{
+                                            "type": "array",
+                                            "items": {
                                                 "$ref": "#/definitions/Class"
                                             }
                                         }
@@ -822,6 +942,129 @@
                     }
                 }
             }
+        },
+        "/api/Announcement/{id}": {
+            "get": {
+                "tags": [
+                    "Announcement"
+                ],
+                "summary": "gets Announcement with passed id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Announcement Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "$ref": "#/definitions/AddAnnouncement"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Branch": {
+            "post": {
+                "tags": [
+                    "Branch"
+                ],
+                "summary": "Creates New Branch",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/AddBranch"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Branch Created Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Added Branch Successfully"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Branch/AllBranches": {
+            "get": {
+                "tags": [
+                    "Branch"
+                ],
+                "summary": "Gets all Branches",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/AllBranches"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -838,45 +1081,45 @@
                 }
             }
         },
-        "AddClassLevel":{
-            "type":"object",
-            "properties":{
-                "name":{
-                    "type":"string"
+        "AddClassLevel": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
                 }
             }
         },
-        "AddClassType":{
-            "type":"object",
-            "properties":{
-                "name":{
-                    "type":"string"
+        "AddClassType": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
                 }
             }
-        },  
+        },
         "AddClass": {
             "type": "object",
             "properties": {
                 "name": {
                     "type": "string"
                 },
-                "description":{
-                    "type":"string"
+                "description": {
+                    "type": "string"
                 },
-                "date":{
-                    "type":"string",
-                    "format":"date-time"
+                "date": {
+                    "type": "string",
+                    "format": "date-time"
                 },
                 "level": {
                     "type": "string",
-                    "description":"reference ObjectID of the class level"
+                    "description": "reference ObjectID of the class level"
                 },
                 "place": {
                     "type": "string"
                 },
                 "type": {
                     "type": "string",
-                    "description":"reference ObjectID of the class type"
+                    "description": "reference ObjectID of the class type"
                 },
                 "classImage": {
                     "type": "string",
@@ -884,25 +1127,25 @@
                 }
             }
         },
-        "ClassLevel":{
+        "ClassLevel": {
             "type": "object",
             "properties": {
-                "_id":{
-                    "type":"string"
+                "_id": {
+                    "type": "string"
                 },
-                "name":{
-                    "type":"string"
+                "name": {
+                    "type": "string"
                 }
             }
         },
-        "ClassType":{
+        "ClassType": {
             "type": "object",
             "properties": {
-                "_id":{
-                    "type":"string"
+                "_id": {
+                    "type": "string"
                 },
-                "name":{
-                    "type":"string"
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -930,15 +1173,15 @@
                 "name": {
                     "type": "string"
                 },
-                "_id":{
-                    "type":"string"
+                "_id": {
+                    "type": "string"
                 },
-                "date":{
-                    "type":"string",
-                    "format":"date-time"
+                "date": {
+                    "type": "string",
+                    "format": "date-time"
                 },
-                "description":{
-                    "type":"string"
+                "description": {
+                    "type": "string"
                 },
                 "level": {
                     "type": "string"
@@ -955,8 +1198,8 @@
                 "imageURL": {
                     "type": "string"
                 },
-                "isLiked":{
-                    "type":"boolean"
+                "isLiked": {
+                    "type": "boolean"
                 }
             }
         },
@@ -985,6 +1228,68 @@
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "ClientInformation": {
+            "type": "object",
+            "properties": {
+                "payload": {
+                    "type": "object",
+                    "properties": {
+                        "returnedAccount": {
+                            "type": "object",
+                            "properties": {
+                                "fullName": {
+                                    "type": "string"
+                                },
+                                "birthDate": {
+                                    "type": "object",
+                                    "properties": {
+                                        "day": {
+                                            "type": "number"
+                                        },
+                                        "month": {
+                                            "type": "number"
+                                        },
+                                        "year": {
+                                            "type": "number"
+                                        }
+                                    }
+                                },
+                                "email": {
+                                    "type": "string"
+                                },
+                                "gender": {
+                                    "type": "string"
+                                },
+                                "mobile": {
+                                    "type": "string"
+                                },
+                                "profilePicture": {
+                                    "type": "string"
+                                },
+                                "likedClasses": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "reservedClasses": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "history": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -1032,6 +1337,42 @@
                             "announcementImage": {
                                 "type": "string",
                                 "format": "binary"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "AddBranch": {
+            "type": "object",
+            "properties": {
+                "place": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "string"
+                },
+                "longitude": {
+                    "type": "string"
+                }
+            }
+        },
+        "AllBranches": {
+            "type": "object",
+            "properties": {
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "place": {
+                                "type": "string"
+                            },
+                            "latitude": {
+                                "type": "string"
+                            },
+                            "longitude": {
+                                "type": "string"
                             }
                         }
                     }

@@ -4,6 +4,7 @@ import announcementModel from '../models/Announcement';
 /////////////////////////////////////////
 import IController from '../interfaces/IController';
 import IAnnouncement from './../interfaces/announcement/IAnnouncement';
+import IRequestWithUser from '../interfaces/IRequestWithUser';
 /////////////////////////////////////////
 import validationMiddleware from '../middlewares/ValidationMiddleware';
 import authMiddleware from '../middlewares/auth';
@@ -27,8 +28,16 @@ class AnnouncementController implements IController {
         this.router.post(`${this.path}`, ImgUpload.single('announcementImage'), validationMiddleware(AddAnnouncementDTO), this.addAnnouncement);
         //////////////////////////////////////////////////////////////////////////////////
         this.router.get(`${this.path}/AllAnnouncements`, authMiddleware, this.getAllAnnouncements)
+        this.router.get(`${this.path}/:id`, authMiddleware, this.getAnnouncement)
 
-
+    }
+    private getAnnouncement = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
+        const _id = request.params.id;
+        await announcementModel
+            .findById(_id, '-__v -createdAt -updatedAt')
+            .then((announcemnet: IAnnouncement) => {
+                response.status(200).send(new Response(undefined, announcemnet).getData());
+            })
     }
     private getAllAnnouncements = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         await announcementModel.find({}, '-_id -createdAt -updatedAt -__v -description -dueDate -termsConditions', (err, announcements) => {
