@@ -40,7 +40,7 @@ class AnnouncementController implements IController {
             })
     }
     private getAllAnnouncements = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-        await announcementModel.find({}, '-_id -createdAt -updatedAt -__v -description -dueDate -termsConditions', (err, announcements) => {
+        await announcementModel.find({}, ' -createdAt -updatedAt -__v -description -dueDate -termsConditions', (err, announcements) => {
             if (err) {
                 next(new SomethingWentWrongException());
             }
