@@ -289,7 +289,7 @@
         "/api/Account/getProfileData": {
             "get": {
                 "tags": [
-                    "Client"
+                    "Account"
                 ],
                 "summary": "Gets all the data of the currently logged in client",
                 "responses": {
