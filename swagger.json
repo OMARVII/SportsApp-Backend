@@ -353,7 +353,6 @@
                 }
             }
         },
-        
         "/api/Class/RateClass": {
             "post": {
                 "tags": [
@@ -1255,6 +1254,52 @@
                     }
                 }
             }
+        },
+        "/api/Branch/{id}": {
+            "get": {
+                "tags": [
+                    "Branch"
+                ],
+                "summary": "gets Branch Type with passed id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Branch Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "$ref": "#/definitions/AddBranch"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1299,7 +1344,7 @@
                 "date": {
                     "type": "string",
                     "format": "date-time",
-                    "description":"2017-07-21T17:32:28Z"
+                    "description": "2017-07-21T17:32:28Z"
                 },
                 "level": {
                     "type": "string",
@@ -1319,7 +1364,7 @@
                 }
             }
         },
-        "RateClass":{
+        "RateClass": {
             "type": "object",
             "properties": {
                 "id": {
@@ -1407,8 +1452,8 @@
                 "isLiked": {
                     "type": "boolean"
                 },
-                "totalRate":{
-                    "type":"number"
+                "totalRate": {
+                    "type": "number"
                 }
             }
         },
@@ -1537,6 +1582,9 @@
                     "items": {
                         "type": "object",
                         "properties": {
+                            "_id": {
+                                "type": "string"
+                            },
                             "title": {
                                 "type": "string"
                             },
