@@ -1,7 +1,7 @@
-import { IsString } from 'class-validator';
+import { IsMongoId } from 'class-validator';
 
 class ReserveClassDTO {
-  @IsString()
+  @IsMongoId()
   public id:string;
 }
 

@@ -10,6 +10,8 @@ interface IClass extends Document {
     likedUsers:string[];
     imageURL:string;
     users:string[];
-    ratings:IRating[]
+    date:Date;
+    ratings:IRating[];
+    totalRate:number;
 }
 export default IClass;

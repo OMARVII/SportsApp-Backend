@@ -1,11 +1,16 @@
-import { IsString } from 'class-validator';
+import { IsString,IsNumber,IsMongoId } from 'class-validator';
 
 class RateClassDTO {
-  @IsString()
+
+  @IsNumber()
   public rate: number;
 
   @IsString()
   public feedback: string;
+  
+  @IsMongoId()
+  public id: string;
+
 }
 
 export default RateClassDTO;

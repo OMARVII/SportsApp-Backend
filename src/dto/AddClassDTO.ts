@@ -1,16 +1,16 @@
-import { IsString,IsDateString } from 'class-validator';
+import { IsString,IsDateString,IsMongoId } from 'class-validator';
 
 class AddClassDTO {
   @IsString()
   public name: string;
 
-  @IsString()
+  @IsMongoId()
   public level: string;
   
-  @IsString()
-  public place: string;
+  @IsMongoId()
+  public branch: string;
   
-  @IsString()
+  @IsMongoId()
   public type: string;
   
   
