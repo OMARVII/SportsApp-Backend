@@ -353,6 +353,55 @@
                 }
             }
         },
+        
+        "/api/Class/RateClass": {
+            "post": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "Creates New Class",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/RateClass"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rated Class Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Rated Class Successfully"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/Class/AddClassType": {
             "post": {
                 "tags": [
@@ -683,12 +732,153 @@
                 }
             }
         },
+        "/api/Class/Level/{id}": {
+            "get": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "gets Class Level with passed id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Class Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "$ref": "#/definitions/ClassLevel"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/Type/{id}": {
+            "get": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "gets Class Type with passed id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Class Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "$ref": "#/definitions/ClassType"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/Class/AllClasses": {
             "get": {
                 "tags": [
                     "Class"
                 ],
                 "summary": "gets all Classes",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Classes Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/Class"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/AllClassesByName/{name}": {
+            "get": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "gets all Classes",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1108,14 +1298,16 @@
                 },
                 "date": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "description":"2017-07-21T17:32:28Z"
                 },
                 "level": {
                     "type": "string",
                     "description": "reference ObjectID of the class level"
                 },
-                "place": {
-                    "type": "string"
+                "branch": {
+                    "type": "string",
+                    "description": "reference ObjectID of the class branch location"
                 },
                 "type": {
                     "type": "string",
@@ -1124,6 +1316,20 @@
                 "classImage": {
                     "type": "string",
                     "format": "binary"
+                }
+            }
+        },
+        "RateClass":{
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "rate": {
+                    "type": "number"
+                },
+                "feedback": {
+                    "type": "string"
                 }
             }
         },
@@ -1186,7 +1392,7 @@
                 "level": {
                     "type": "string"
                 },
-                "place": {
+                "branch": {
                     "type": "string"
                 },
                 "type": {
@@ -1200,6 +1406,9 @@
                 },
                 "isLiked": {
                     "type": "boolean"
+                },
+                "totalRate":{
+                    "type":"number"
                 }
             }
         },

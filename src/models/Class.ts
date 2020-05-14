@@ -21,9 +21,10 @@ const classSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    place:{
-        type: String,
-        required: true
+    branch:{
+        ref:'branch',
+        type:mongoose.Schema.Types.ObjectId,
+        required:true
     },
     type: {
         ref:'Class Type',
@@ -49,6 +50,9 @@ const classSchema = new mongoose.Schema({
     imageURL:{
         type:String,
         required:true
+    },
+    totalRate:{
+        type:Number
     },
     ratings:[{
         rate:{
