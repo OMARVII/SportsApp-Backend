@@ -4,6 +4,7 @@ import branchModel from '../models/Branch';
 /////////////////////////////////////////
 import IController from '../interfaces/IController';
 import IBranch from './../interfaces/IBranch';
+import IRequestWithUser from '../interfaces/IRequestWithUser';
 /////////////////////////////////////////
 import validationMiddleware from '../middlewares/ValidationMiddleware';
 import authMiddleware from '../middlewares/auth';
@@ -26,8 +27,18 @@ class BranchController implements IController {
         this.router.post(`${this.path}`, validationMiddleware(AddBranchDTO), this.addBranch);
         //////////////////////////////////////////////////////////////////////////////////
         this.router.get(`${this.path}/AllBranches`, authMiddleware, this.getAllBranches)
+        this.router.get(`${this.path}/:id`, authMiddleware, this.getBranch);
 
-
+    }
+    private getBranch = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
+        const _id = request.params.id;
+        await branchModel
+            .findById(_id, '-__v -createdAt -updatedAt')
+            .then((branch: IBranch) => {
+                response.status(200).send(new Response(undefined, branch).getData());
+            }).catch(({ error }: any) => {
+                next(new SomethingWentWrongException(error))
+            })
     }
     private getAllBranches = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         await branchModel.find({}, '-createdAt -updatedAt -__v', (err, branches) => {
