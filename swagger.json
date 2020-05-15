@@ -909,6 +909,47 @@
                 }
             }
         },
+        "/api/Class/History": {
+            "get": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "gets all user history Classes",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Classes Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/Class"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/Class/AllClassesByName/{name}": {
             "get": {
                 "tags": [
@@ -1005,6 +1046,76 @@
                     "Class"
                 ],
                 "summary": "gets all user liked Classes",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched Classes Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "payload": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/Class"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Class/AllClassesByFilter": {
+            "post": {
+                "tags": [
+                    "Class"
+                ],
+                "summary": "gets all Classes by filters",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "types": {
+                                        "type": "array",
+                                        "items":{
+                                            "type":"string"
+                                        }
+                                    },
+                                    "levels": {
+                                        "type": "array",
+                                        "items":{
+                                            "type":"string"
+                                        }
+                                    },
+                                    "branches": {
+                                        "type": "array",
+                                        "items":{
+                                            "type":"string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "produces": [
                     "application/json"
                 ],
