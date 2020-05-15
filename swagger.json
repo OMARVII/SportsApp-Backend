@@ -324,10 +324,15 @@
                     "200": {
                         "description": "Updated Successfully",
                         "content": {
-                            "text/plain": {
+                            "application/json": {
                                 "schema": {
-                                    "type": "string",
-                                    "example": "Updated Successfully"
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Updated Successfully"
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1700,7 +1705,7 @@
                     "type": "object",
                     "properties": {
                         "day": {
-                            "type":"number"
+                            "type": "number"
                         },
                         "month": {
                             "type": "number"
