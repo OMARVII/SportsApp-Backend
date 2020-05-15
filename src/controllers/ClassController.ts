@@ -26,6 +26,7 @@ import RateClassDTO from '../dto/RateClassDTO'
 ////////////////////////////////////////
 import Response from './../modules/Response';
 import { refresh } from '../modules/RefreshDatabase';
+import {asyncForEach} from '../modules/HelperFunctions'
 /////////////////////////////////////////
 import SomethingWentWrongException from './../exceptions/SomethingWentWrongException';
 import IBranch from './../interfaces/IBranch';
@@ -91,15 +92,10 @@ class ClassController implements IController {
             })
         })
     }
-    private async asyncForEach(array:IClass[], callback:any) {
-        for (let index = 0; index < array.length; index++) {
-          await callback(array[index]);
-        }
-      }
     private async formatClasses(classes:IClass[]):Promise<any[]>{
         let formatedClasses:any = []
         return new Promise<[]>(async(resolve,reject)=>{
-            await this.asyncForEach(classes, async (obj:IClass)=>{
+            await asyncForEach(classes, async (obj:IClass)=>{
                 let c = obj.toObject();
             await this.getLevelById(obj.level)
             .then((level:IClassLevel)=>{
@@ -148,17 +144,19 @@ class ClassController implements IController {
         }
     }
     private getHistory = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {    
-        await refresh().then(async ()=>{
+        await refresh(request.user)
+        .then(async (client:IClient) =>{
+            request.user = client;
             await classModel.find({_id:{$in:request.user.history}})
-        .then(async (classes:IClass[])=>{
-            let returnedClasses = [];
-            await this.formatClasses(classes)
-            .then(formatedClasses=>{
-                formatedClasses.forEach((c,index) => {
-                    returnedClasses[index] = c;
-                    returnedClasses[index].isRated = false;
-                    for(let i=0;i<c.ratings.length;i++){
-                        if(c.ratings[i].userID === request.user.id){
+            .then(async (classes:IClass[])=>{
+                let returnedClasses = [];
+                await this.formatClasses(classes)
+                .then(formatedClasses=>{
+                    formatedClasses.forEach((c,index) => {
+                        returnedClasses.push(c)
+                        returnedClasses[index].isRated = false;
+                    for(let i=0;i<returnedClasses[index].ratings.length;i++){
+                        if(returnedClasses[index].ratings[i].userID == request.user.id){
                             returnedClasses[index].isRated = true;
                             break;
                         }
@@ -388,8 +386,8 @@ class ClassController implements IController {
                 let classes = [];
                 await this.formatClasses(classObj).then(formattedArrays=>{
                     formattedArrays.forEach(element => {
-                         element.isLiked = false;
-                        if (element.likedUsers.includes(request.user._id)) {
+                        element.isLiked = false;
+                        if (element.likedUsers.map(user=>user.toString()).includes(request.user.id)) {
                             element.isLiked = true
                         }
                         classes.push({ ...element, likedUsers: undefined })
@@ -413,7 +411,7 @@ class ClassController implements IController {
                 .findById(_id)
                 .then(async (classObj: IClass) => {
                     if(classObj){
-                        const userStatus = classObj.likedUsers.includes(request.user._id);
+                        const userStatus = classObj.likedUsers.includes(request.user.id);
                         if (status) {
                             if(!userStatus){
                                 classObj.numberOfLikes += 1;
