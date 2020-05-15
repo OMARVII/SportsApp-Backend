@@ -4,7 +4,7 @@ interface IClass extends Document {
     _id: string;
     name: string;
     level: string;
-    place: string;
+    branch: string;
     type:string;
     numberOfLikes:number;
     likedUsers:string[];

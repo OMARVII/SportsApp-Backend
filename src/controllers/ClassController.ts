@@ -4,14 +4,14 @@ import {Types} from 'mongoose'
 import classModel from '../models/Class';
 import classLevelModel from '../models/ClassLevel'
 import classTypeModel from '../models/ClassType'
-
+import branchModel from '../models/Branch';
 /////////////////////////////////////////
 import IController from '../interfaces/IController';
 import IRequestWithUser from '../interfaces/IRequestWithUser';
 import IClass from './../interfaces/class/IClass';
 import IClient from './../interfaces/user/IClient';
 import IClassLevel from '../interfaces/class/ILevel';
-
+import IClassType from 'interfaces/class/IType';
 /////////////////////////////////////////
 import validationMiddleware from '../middlewares/ValidationMiddleware';
 import authMiddleware from '../middlewares/auth';
@@ -25,10 +25,10 @@ import ClassFilterDTO from '../dto/ClassFilterDTO';
 import RateClassDTO from '../dto/RateClassDTO'
 ////////////////////////////////////////
 import Response from './../modules/Response';
+import { refresh } from '../modules/RefreshDatabase';
 /////////////////////////////////////////
 import SomethingWentWrongException from './../exceptions/SomethingWentWrongException';
-import IClassType from 'interfaces/class/IType';
-import { refresh } from '../modules/RefreshDatabase';
+import IBranch from './../interfaces/IBranch';
 
 class ClassController implements IController {
     public path: string;
@@ -44,7 +44,6 @@ class ClassController implements IController {
         this.router.get(`${this.path}/ClassTypes`, authMiddleware, this.getClassTypes);
         this.router.get(`${this.path}/ReservedClasses`, authMiddleware, this.getReservedClasses);
         this.router.get(`${this.path}/FavouriteClasses`, authMiddleware, this.getFavouriteClasses);
-        this.router.get(`${this.path}/AllClassesByName/:name`, authMiddleware, this.getAllClassesByName);
         this.router.get(`${this.path}/History`, authMiddleware, this.getHistory);
         
         this.router.get(`${this.path}/Type/:id`, authMiddleware, this.getType);
@@ -52,6 +51,7 @@ class ClassController implements IController {
         
         //////////////////////////////////////////////////////////////////////////////////
         this.router.post(`${this.path}`, ImgUpload.single('classImage'), validationMiddleware(AddClassDTO), this.addClass);
+        this.router.post(`${this.path}/AllClassesByName`, this.getAllClassesByName);
         this.router.post(`${this.path}/AllClassesByFilter`, authMiddleware,validationMiddleware(ClassFilterDTO,true),  this.getAllClassesByFilter);
         this.router.post(`${this.path}/ReserveClass`, authMiddleware, validationMiddleware(ReserveClassDTO), this.reserveClass);
         this.router.post(`${this.path}/AddClassLevel`, authMiddleware, validationMiddleware(AddClassLevelDTO), this.addClassLevel);
@@ -64,12 +64,70 @@ class ClassController implements IController {
         ////////////////////////////////////////////////////////////////////////////
         this.router.get(`${this.path}/:id`, authMiddleware, this.getClass);
     }
+    private async getLevelById(id:string):Promise<IClassLevel>{
+        return new Promise<IClassLevel>(async(resolve,reject)=>{
+            await classLevelModel.findById(id).then((level:IClassLevel)=>{
+                resolve(level);
+            }).catch(err=>{
+                reject(err);
+            })
+        })
+    }
+    private async getTypeById(id:string):Promise<IClassType>{
+        return new Promise<IClassType>(async(resolve,reject)=>{
+            await classTypeModel.findById(id).then((level:IClassType)=>{
+                resolve(level);
+            }).catch(err=>{
+                reject(err);
+            })
+        })
+    }
+    private async getBranchById(id:string):Promise<IBranch>{
+        return new Promise<IBranch>(async(resolve,reject)=>{
+            await branchModel.findById(id).then((level:IBranch)=>{
+                resolve(level);
+            }).catch(err=>{
+                reject(err);
+            })
+        })
+    }
+    private async asyncForEach(array:IClass[], callback:any) {
+        for (let index = 0; index < array.length; index++) {
+          await callback(array[index]);
+        }
+      }
+    private async formatClasses(classes:IClass[]):Promise<any[]>{
+        let formatedClasses:any = []
+        return new Promise<[]>(async(resolve,reject)=>{
+            await this.asyncForEach(classes, async (obj:IClass)=>{
+                let c = obj.toObject();
+            await this.getLevelById(obj.level)
+            .then((level:IClassLevel)=>{
+                c.level = level.name;
+            }).then(async()=>{
+                await this.getTypeById(obj.type)
+                .then((type:IClassType)=>{
+                    c.type = type.name
+                })
+                .then(async()=>{
+                    await this.getBranchById(obj.branch)
+                    .then((branch:IBranch)=>{
+                        c.branch =  branch.place;
+                    })
+                }).then(()=>{
+                    formatedClasses.push(c);
+                })
+            })
+            }).then(()=>{
+                resolve(formatedClasses)
+            })
+        })
+    }
     private getLevel = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         const _id = request.params.id;
         if(Types.ObjectId.isValid(_id)){
-            await classLevelModel
-                .findById(_id, '-__v -createdAt -updatedAt')
-                .then((level: IClassLevel) => {
+            await this.getLevelById(_id)
+            .then((level: IClassLevel) => {
                     response.status(200).send(new Response(undefined, level).getData());
                 })
         }
@@ -80,9 +138,8 @@ class ClassController implements IController {
     private getType = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         const _id = request.params.id;
         if(Types.ObjectId.isValid(_id)){
-            await classTypeModel
-                .findById(_id, '-__v -createdAt -updatedAt')
-                .then((type: IClassType) => {
+            await this.getTypeById(_id)
+            .then((type: IClassType) => {
                     response.status(200).send(new Response(undefined, type).getData());
                 })
         }
@@ -93,19 +150,24 @@ class ClassController implements IController {
     private getHistory = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {    
         await refresh().then(async ()=>{
             await classModel.find({_id:{$in:request.user.history}})
-        .then((classes:IClass[])=>{
+        .then(async (classes:IClass[])=>{
             let returnedClasses = [];
-            classes.forEach((c,index) => {
-                returnedClasses[index] = c.toObject();
-                returnedClasses[index].isRated = false;
-                for(let i=0;i<c.ratings.length;i++){
-                    if(c.ratings[i].userID === request.user.id){
-                        returnedClasses[index].isRated = true;
-                        break;
+            await this.formatClasses(classes)
+            .then(formatedClasses=>{
+                formatedClasses.forEach((c,index) => {
+                    returnedClasses[index] = c;
+                    returnedClasses[index].isRated = false;
+                    for(let i=0;i<c.ratings.length;i++){
+                        if(c.ratings[i].userID === request.user.id){
+                            returnedClasses[index].isRated = true;
+                            break;
+                        }
                     }
-                }
-            });
-            response.status(200).send(new Response(undefined, returnedClasses).getData());
+                });
+            })
+            .then(()=>{
+                response.status(200).send(new Response(undefined, returnedClasses).getData());
+            })
         })
         })
     }
@@ -159,20 +221,18 @@ class ClassController implements IController {
             })
     }
     private getAllClassesByName = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
-        const searchName = request.params.name;
-        if (searchName) {
+        const searchName = request.body.name;
             await classModel
                 .find({ name : new RegExp(searchName,'i'),date: { $gte: new Date()}  }, '-__v -createdAt -updatedAt')
-                .then((classObj: IClass[]) => {
-                    response.status(200).send(new Response(undefined, classObj).getData());
+                .then(async(classes: IClass[]) => {
+                    await this.formatClasses(classes)
+                    .then(formatedClasses=>{
+                        response.status(200).send(new Response(undefined, formatedClasses).getData());
+                    })
                 })
                 .catch(err => {
                     next(new SomethingWentWrongException(err));
                 })
-        }
-        else {
-            next(new SomethingWentWrongException("No Name Was Provided"));
-        }
     }
     private getAllClassesByFilter = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         const filter:ClassFilterDTO =  request.body;
@@ -199,8 +259,11 @@ class ClassController implements IController {
             'date': { $gte: new Date()} 
         }
         await classModel.find(query)
-        .then((classes:IClass[])=>{
-            response.status(200).send(new Response(undefined, classes).getData());
+        .then(async(classes:IClass[])=>{
+            await this.formatClasses(classes)
+            .then(formatedClasses=>{
+                response.status(200).send(new Response(undefined, formatedClasses).getData());
+            })
         })
         .catch(err=>{
             next(new SomethingWentWrongException(err));
@@ -219,8 +282,11 @@ class ClassController implements IController {
     }
     private getReservedClasses = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         this.getClassesWithID(request.user.reservedClasses)
-            .then((classes: IClass[]) => {
-                response.status(200).send(new Response(undefined, classes).getData());
+            .then(async (classes: IClass[]) => {
+                await this.formatClasses(classes)
+                .then(formatedClasses=>{
+                    response.status(200).send(new Response(undefined, formatedClasses).getData());
+                })
             })
             .catch(err => {
                 next(new SomethingWentWrongException(err));
@@ -228,8 +294,11 @@ class ClassController implements IController {
     }
     private getFavouriteClasses = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         this.getClassesWithID(request.user.likedClasses)
-            .then((classes: IClass[]) => {
-                response.status(200).send(new Response(undefined, classes).getData());
+            .then(async (classes: IClass[]) => {
+                await this.formatClasses(classes)
+                .then(formatedClasses=>{
+                    response.status(200).send(new Response(undefined, formatedClasses).getData());
+                })
             })
             .catch(err => {
                 next(new SomethingWentWrongException(err));
@@ -315,16 +384,18 @@ class ClassController implements IController {
     private getAllClasses = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         await classModel
             .find({ date: { $gte: new Date()} }, '-__v -createdAt -updatedAt')
-            .then((classObj: IClass[]) => {
+            .then(async (classObj: IClass[]) => {
                 let classes = [];
-                classObj.forEach(element => {
-                    let isLiked = false;
-                    if (element.likedUsers.includes(request.user._id)) {
-                        isLiked = true;
-                    }
-                    classes.push({ ...element.toObject(), isLiked, likedUsers: undefined })
-                });
-                response.status(200).send(new Response(undefined, classes).getData());
+                await this.formatClasses(classObj).then(formattedArrays=>{
+                    formattedArrays.forEach(element => {
+                         element.isLiked = false;
+                        if (element.likedUsers.includes(request.user._id)) {
+                            element.isLiked = true
+                        }
+                        classes.push({ ...element, likedUsers: undefined })
+                    });
+                    response.status(200).send(new Response(undefined, classes).getData());
+                })
             })
     }
     private like = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
@@ -415,14 +486,17 @@ class ClassController implements IController {
                 .findById(rating.id, '-__v -createdAt -updatedAt')
                 .then((classObj: IClass) => {
                     classObj.ratings.push({rate:rating.rate,feedback:rating.feedback,userID:request.user._id});
-                    let totalRate:number;
+                    let totalRate:number = 0;
                     for(let i=0;i<classObj.ratings.length;i++){
                         totalRate += classObj.ratings[i].rate;
                     }
                     totalRate/=classObj.ratings.length;
                     classObj.totalRate = Math.ceil(totalRate);
                     classObj.save().then(() => {
-                        response.status(201).send(new Response('Rated Class Succesfully', undefined).getData());
+                        response.status(200).send(new Response('Rated Class Succesfully', undefined).getData());
+                    })
+                    .catch(err=>{
+                        next(new SomethingWentWrongException(err))
                     })
                 })
                 .catch(err=>{

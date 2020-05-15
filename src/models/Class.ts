@@ -52,7 +52,8 @@ const classSchema = new mongoose.Schema({
         required:true
     },
     totalRate:{
-        type:Number
+        type:Number,
+        default:0
     },
     ratings:[{
         userID:{
