@@ -950,23 +950,28 @@
                 }
             }
         },
-        "/api/Class/AllClassesByName/{name}": {
-            "get": {
+        "/api/Class/AllClassesByName": {
+            "post": {
                 "tags": [
                     "Class"
                 ],
                 "summary": "gets all Classes",
-                "parameters": [
-                    {
-                        "name": "name",
-                        "in": "path",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
                 "produces": [
                     "application/json"
                 ],
+                "requestBody":{
+                    "content":{
+                        "application/json":{
+                            "schema":{
+                                "properties":{
+                                    "name":{
+                                        "type":"string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Fetched Classes Successfully",
