@@ -305,6 +305,46 @@
                 }
             }
         },
+        "/api/Account": {
+            "patch": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Updates the currently logged in Client",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/definitions/ClientUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated Successfully",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Updated Successfully"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/Class": {
             "post": {
                 "tags": [
@@ -1638,6 +1678,41 @@
                             }
                         }
                     }
+                }
+            }
+        },
+        "ClientUpdate": {
+            "type": "object",
+            "properties": {
+                "fullName": {
+                    "type": "string"
+                },
+                "mobile": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "birthDate": {
+                    "type": "object",
+                    "properties": {
+                        "day": {
+                            "type":"number"
+                        },
+                        "month": {
+                            "type": "number"
+                        },
+                        "year": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "profilePicture": {
+                    "type": "string",
+                    "format": "binary"
                 }
             }
         }
