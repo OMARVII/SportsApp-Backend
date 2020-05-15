@@ -21,13 +21,14 @@ import AddClassDTO from './../dto/AddClassDTO';
 import ReserveClassDTO from './../dto/ReserveClassDTO';
 import AddClassLevelDTO from '../dto/AddClassLevelDTO'
 import AddClassTypeDTO from '../dto/AddClassTypeDTO'
-
+import ClassFilterDTO from '../dto/ClassFilterDTO';
 import RateClassDTO from '../dto/RateClassDTO'
 ////////////////////////////////////////
 import Response from './../modules/Response';
 /////////////////////////////////////////
 import SomethingWentWrongException from './../exceptions/SomethingWentWrongException';
 import IClassType from 'interfaces/class/IType';
+import { refresh } from '../modules/RefreshDatabase';
 
 class ClassController implements IController {
     public path: string;
@@ -44,12 +45,14 @@ class ClassController implements IController {
         this.router.get(`${this.path}/ReservedClasses`, authMiddleware, this.getReservedClasses);
         this.router.get(`${this.path}/FavouriteClasses`, authMiddleware, this.getFavouriteClasses);
         this.router.get(`${this.path}/AllClassesByName/:name`, authMiddleware, this.getAllClassesByName);
-
+        this.router.get(`${this.path}/History`, authMiddleware, this.getHistory);
+        
         this.router.get(`${this.path}/Type/:id`, authMiddleware, this.getType);
         this.router.get(`${this.path}/Level/:id`, authMiddleware, this.getLevel);
         
         //////////////////////////////////////////////////////////////////////////////////
         this.router.post(`${this.path}`, ImgUpload.single('classImage'), validationMiddleware(AddClassDTO), this.addClass);
+        this.router.post(`${this.path}/AllClassesByFilter`, authMiddleware,validationMiddleware(ClassFilterDTO,true),  this.getAllClassesByFilter);
         this.router.post(`${this.path}/ReserveClass`, authMiddleware, validationMiddleware(ReserveClassDTO), this.reserveClass);
         this.router.post(`${this.path}/AddClassLevel`, authMiddleware, validationMiddleware(AddClassLevelDTO), this.addClassLevel);
         this.router.post(`${this.path}/AddClassType`, authMiddleware, validationMiddleware(AddClassTypeDTO), this.addClassType);
@@ -59,7 +62,6 @@ class ClassController implements IController {
         //////////////////////////////////////////////////////////////////////////////////
         this.router.put(`${this.path}/Like/:id`, authMiddleware, this.like);
         ////////////////////////////////////////////////////////////////////////////
-        //this.router.delete(`${this.path}/:id`,authMiddleware,this.deleteClass);
         this.router.get(`${this.path}/:id`, authMiddleware, this.getClass);
     }
     private getLevel = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
@@ -87,6 +89,25 @@ class ClassController implements IController {
         else{
             next(new SomethingWentWrongException('Wrong ID Format'))
         }
+    }
+    private getHistory = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {    
+        await refresh().then(async ()=>{
+            await classModel.find({_id:{$in:request.user.history}})
+        .then((classes:IClass[])=>{
+            let returnedClasses = [];
+            classes.forEach((c,index) => {
+                returnedClasses[index] = c.toObject();
+                returnedClasses[index].isRated = false;
+                for(let i=0;i<c.ratings.length;i++){
+                    if(c.ratings[i].userID === request.user.id){
+                        returnedClasses[index].isRated = true;
+                        break;
+                    }
+                }
+            });
+            response.status(200).send(new Response(undefined, returnedClasses).getData());
+        })
+        })
     }
     private getClass = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         const _id = request.params.id;
@@ -141,7 +162,7 @@ class ClassController implements IController {
         const searchName = request.params.name;
         if (searchName) {
             await classModel
-                .find({ name : new RegExp(searchName,'i') }, '-__v -createdAt -updatedAt')
+                .find({ name : new RegExp(searchName,'i'),date: { $gte: new Date()}  }, '-__v -createdAt -updatedAt')
                 .then((classObj: IClass[]) => {
                     response.status(200).send(new Response(undefined, classObj).getData());
                 })
@@ -152,6 +173,38 @@ class ClassController implements IController {
         else {
             next(new SomethingWentWrongException("No Name Was Provided"));
         }
+    }
+    private getAllClassesByFilter = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
+        const filter:ClassFilterDTO =  request.body;
+        let query={};
+        if(filter.levels){
+            query = {
+                'level': { $in: filter.levels }
+            }
+        }
+        if(filter.types){
+            query = {
+                ...query,
+                'type': { $in: filter.types }
+            }
+        }
+        if(filter.branches){
+            query = {
+                ...query,
+                'branch': { $in: filter.branches },
+            }
+        }
+        query ={
+            ...query,
+            'date': { $gte: new Date()} 
+        }
+        await classModel.find(query)
+        .then((classes:IClass[])=>{
+            response.status(200).send(new Response(undefined, classes).getData());
+        })
+        .catch(err=>{
+            next(new SomethingWentWrongException(err));
+        })
     }
     private getClassesWithID = async (idArray: string[]): Promise<IClass[]> => {
         return new Promise(async (resolve, reject) => {
@@ -192,6 +245,9 @@ class ClassController implements IController {
                 if (obj) {
                     if(request.user.reservedClasses.includes(body.id)){
                         response.status(200).send(new Response("Class Already Reserved", undefined).getData());
+                    }
+                    else if(obj.date< new Date()){
+                        response.status(200).send(new Response(`Class was scheduled on ${obj.date}, which has passed :(`, undefined).getData());    
                     }
                     else{
                         request.user.reservedClasses.push(body.id);
@@ -258,7 +314,7 @@ class ClassController implements IController {
     }
     private getAllClasses = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         await classModel
-            .find({}, '-__v -createdAt -updatedAt')
+            .find({ date: { $gte: new Date()} }, '-__v -createdAt -updatedAt')
             .then((classObj: IClass[]) => {
                 let classes = [];
                 classObj.forEach(element => {
@@ -354,11 +410,11 @@ class ClassController implements IController {
     }
     private rateClass = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         const rating: RateClassDTO = request.body;
-         //if(request.user.history.includes(_id)){
+         if(request.user.history.includes(rating.id)){
                 await classModel
                 .findById(rating.id, '-__v -createdAt -updatedAt')
                 .then((classObj: IClass) => {
-                    classObj.ratings.push({rate:rating.rate,feedback:rating.feedback});
+                    classObj.ratings.push({rate:rating.rate,feedback:rating.feedback,userID:request.user._id});
                     let totalRate:number;
                     for(let i=0;i<classObj.ratings.length;i++){
                         totalRate += classObj.ratings[i].rate;
@@ -370,12 +426,12 @@ class ClassController implements IController {
                     })
                 })
                 .catch(err=>{
-                    console.log(err);
+                   next(new SomethingWentWrongException(err))
                 })
-            //}
-            // else{
-            //     next(new SomethingWentWrongException("You Didn't Attend The Class"))
-            // }
+            }
+             else{
+                 next(new SomethingWentWrongException("You Didn't Attend The Class Yet"))
+             }
     }
 }
 export default ClassController;

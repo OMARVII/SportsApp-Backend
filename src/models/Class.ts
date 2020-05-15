@@ -55,6 +55,10 @@ const classSchema = new mongoose.Schema({
         type:Number
     },
     ratings:[{
+        userID:{
+            ref:'users',
+            type:mongoose.Types.ObjectId
+        },
         rate:{
             type:Number
         },

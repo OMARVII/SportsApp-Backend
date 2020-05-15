@@ -1,4 +1,5 @@
 interface IRating {
+    userID:string;
     rate: number;
     feedback:string;
 }
