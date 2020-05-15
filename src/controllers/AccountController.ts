@@ -45,6 +45,8 @@ class AccountController implements IController {
 
     private updateAccount = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         let newData: UpdateClientDTO = request.body;
+        const imageURL = request.file["location"];
+        newData["profilePicture"] = imageURL;
         let newObj = {};
         Object.keys(newData).forEach((prop) => {
             if (newData[prop]) { newObj[prop] = newData[prop]; }
