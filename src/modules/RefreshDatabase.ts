@@ -3,24 +3,24 @@ import clientModel from './../models/user/Client';
 import IClient from './../interfaces/user/IClient';
 import IClass from './../interfaces/class/IClass';
 
-export async function refresh(){
-    const currentDate = new Date();
-    await classModel.find({})
-    .then(async (classes:IClass[])=>{
-        classes.forEach(async (classObj:IClass) => {
-            if(classObj.date<currentDate){
-                await clientModel.find({ '_id': { $in: classObj.users }})
-                .then(async(clients:IClient[])=>{
-                    clients.forEach(async(client) => {
-                        if(client.reservedClasses.includes(classObj._id)){
-                            const classIndex = client.reservedClasses.indexOf(classObj._id);
-                            client.reservedClasses.splice(classIndex,1);
-                            client.history.push(classObj._id);
-                            await client.save();
-                        }
-                    });
+export async function refresh(user:IClient):Promise<IClient>{
+    return new Promise<IClient>(async (resolve,reject)=>{
+        const currentDate = new Date();
+        await(async ()=>{
+            for(let i=0;i<user.reservedClasses.length;i++){
+                await classModel.findById(user.reservedClasses[i])
+                .then((classObj:IClass)=>{
+                    if(classObj.date<currentDate){
+                        user.history.push(classObj.id);
+                        user.reservedClasses.splice(i,1);
+                        i--;
+                    }
                 })
-            }
-        });
+            }  
+        })()
+        await user.save().then((client:IClient)=>{
+            resolve(client)
+        })
+        
     })
 }
