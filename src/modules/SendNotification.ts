@@ -12,8 +12,7 @@ export const getTokens = async () => {
     return pushTokens;
 
 }
-export const SendNotfication = (title: string, body : string, pushTokens : any) => {
-
+export const SendNotfication = (title: string, body: any, data: any, pushTokens: any) => {
     let notifications = [];
     for (let pushToken of pushTokens) {
         if (!Expo.isExpoPushToken(pushToken)) {
@@ -26,7 +25,7 @@ export const SendNotfication = (title: string, body : string, pushTokens : any) 
             sound: "default",
             title: title,
             body: body,
-            data: { body }
+            data: data 
         });
     }
 

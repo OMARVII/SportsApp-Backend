@@ -462,25 +462,27 @@ class ClassController implements IController {
         }
     }
     private addClass = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-
+   
         if (request.file === undefined) {
             next(new SomethingWentWrongException('Error: No File Selected!'))
         }
         else {
+            let pushTokens = await getTokens();
             const classInfo: AddClassDTO = request.body;
             const imageURL = request.file["location"];
             await classModel
                 .create({ ...classInfo, imageURL })
                 .then((classObj: IClass) => {
                     response.status(201).send(new Response('Class Created', undefined).getData());
+                    let classType = classObj.name.split(" ")[0];
+                    SendNotfication(`New ${classType} Class Available Now!`, `Hurry Up and Reserve Now!`, { 'id': classObj.id }, pushTokens)
                 })
                 .catch((errmsg: any) => {
 
                     next(new SomethingWentWrongException(errmsg))
                 })
 
-            let pushTokens = await getTokens();
-            SendNotfication(`New ${classInfo.type} Class Available Now!`, `Hurry Up and Reserve Now!`, pushTokens)
+
         }
     }
     private rateClass = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
