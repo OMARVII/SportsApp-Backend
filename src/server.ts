@@ -11,11 +11,6 @@ import AdminController from './controllers/AdminController'
 
 validateEnv();
 
-//runs at midnight everyday
-// cron.schedule("0 0 0 * * *", function() {
-//     refresh();
-// });
-
 const app = new App(
     [
         new AccountController(),
