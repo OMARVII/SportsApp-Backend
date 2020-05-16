@@ -53,7 +53,6 @@ class BranchController implements IController {
     private addBranch = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
 
         const branchInfo: AddBranchDTO = request.body;
-        console.log(branchInfo)
 
         await branchModel
             .create({ ...branchInfo })
