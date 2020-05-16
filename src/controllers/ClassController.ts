@@ -1,10 +1,11 @@
 import * as express from 'express';
-import {Types} from 'mongoose'
+import { Types } from 'mongoose'
 /////////////////////////////////////////
 import classModel from '../models/Class';
 import classLevelModel from '../models/ClassLevel'
 import classTypeModel from '../models/ClassType'
 import branchModel from '../models/Branch';
+import PushToken from '../models/PushToken';
 /////////////////////////////////////////
 import IController from '../interfaces/IController';
 import IRequestWithUser from '../interfaces/IRequestWithUser';
@@ -12,6 +13,7 @@ import IClass from './../interfaces/class/IClass';
 import IClient from './../interfaces/user/IClient';
 import IClassLevel from '../interfaces/class/ILevel';
 import IClassType from 'interfaces/class/IType';
+import { getTokens, SendNotfication } from '../modules/SendNotification'
 /////////////////////////////////////////
 import validationMiddleware from '../middlewares/ValidationMiddleware';
 import authMiddleware from '../middlewares/auth';
@@ -26,7 +28,7 @@ import RateClassDTO from '../dto/RateClassDTO'
 ////////////////////////////////////////
 import Response from './../modules/Response';
 import { refresh } from '../modules/RefreshDatabase';
-import {asyncForEach} from '../modules/HelperFunctions'
+import { asyncForEach } from '../modules/HelperFunctions'
 /////////////////////////////////////////
 import SomethingWentWrongException from './../exceptions/SomethingWentWrongException';
 import IBranch from './../interfaces/IBranch';
@@ -46,14 +48,14 @@ class ClassController implements IController {
         this.router.get(`${this.path}/ReservedClasses`, authMiddleware, this.getReservedClasses);
         this.router.get(`${this.path}/FavouriteClasses`, authMiddleware, this.getFavouriteClasses);
         this.router.get(`${this.path}/History`, authMiddleware, this.getHistory);
-        
+
         this.router.get(`${this.path}/Type/:id`, authMiddleware, this.getType);
         this.router.get(`${this.path}/Level/:id`, authMiddleware, this.getLevel);
-        
+
         //////////////////////////////////////////////////////////////////////////////////
         this.router.post(`${this.path}`, ImgUpload.single('classImage'), validationMiddleware(AddClassDTO), this.addClass);
         this.router.post(`${this.path}/AllClassesByName`, this.getAllClassesByName);
-        this.router.post(`${this.path}/AllClassesByFilter`, authMiddleware,validationMiddleware(ClassFilterDTO,true),  this.getAllClassesByFilter);
+        this.router.post(`${this.path}/AllClassesByFilter`, authMiddleware, validationMiddleware(ClassFilterDTO, true), this.getAllClassesByFilter);
         this.router.post(`${this.path}/ReserveClass`, authMiddleware, validationMiddleware(ReserveClassDTO), this.reserveClass);
         this.router.post(`${this.path}/AddClassLevel`, authMiddleware, validationMiddleware(AddClassLevelDTO), this.addClassLevel);
         this.router.post(`${this.path}/AddClassType`, authMiddleware, validationMiddleware(AddClassTypeDTO), this.addClassType);
@@ -65,120 +67,120 @@ class ClassController implements IController {
         ////////////////////////////////////////////////////////////////////////////
         this.router.get(`${this.path}/:id`, authMiddleware, this.getClass);
     }
-    private async getLevelById(id:string):Promise<IClassLevel>{
-        return new Promise<IClassLevel>(async(resolve,reject)=>{
-            await classLevelModel.findById(id).then((level:IClassLevel)=>{
+    private async getLevelById(id: string): Promise<IClassLevel> {
+        return new Promise<IClassLevel>(async (resolve, reject) => {
+            await classLevelModel.findById(id).then((level: IClassLevel) => {
                 resolve(level);
-            }).catch(err=>{
+            }).catch(err => {
                 reject(err);
             })
         })
     }
-    private async getTypeById(id:string):Promise<IClassType>{
-        return new Promise<IClassType>(async(resolve,reject)=>{
-            await classTypeModel.findById(id).then((level:IClassType)=>{
+    private async getTypeById(id: string): Promise<IClassType> {
+        return new Promise<IClassType>(async (resolve, reject) => {
+            await classTypeModel.findById(id).then((level: IClassType) => {
                 resolve(level);
-            }).catch(err=>{
+            }).catch(err => {
                 reject(err);
             })
         })
     }
-    private async getBranchById(id:string):Promise<IBranch>{
-        return new Promise<IBranch>(async(resolve,reject)=>{
-            await branchModel.findById(id).then((level:IBranch)=>{
+    private async getBranchById(id: string): Promise<IBranch> {
+        return new Promise<IBranch>(async (resolve, reject) => {
+            await branchModel.findById(id).then((level: IBranch) => {
                 resolve(level);
-            }).catch(err=>{
+            }).catch(err => {
                 reject(err);
             })
         })
     }
-    private async formatClasses(classes:IClass[]):Promise<any[]>{
-        let formatedClasses:any = []
-        return new Promise<[]>(async(resolve,reject)=>{
-            await asyncForEach(classes, async (obj:IClass)=>{
+    private async formatClasses(classes: IClass[]): Promise<any[]> {
+        let formatedClasses: any = []
+        return new Promise<[]>(async (resolve, reject) => {
+            await asyncForEach(classes, async (obj: IClass) => {
                 let c = obj.toObject();
-            await this.getLevelById(obj.level)
-            .then((level:IClassLevel)=>{
-                c.level = level.name;
-            }).then(async()=>{
-                await this.getTypeById(obj.type)
-                .then((type:IClassType)=>{
-                    c.type = type.name
-                })
-                .then(async()=>{
-                    await this.getBranchById(obj.branch)
-                    .then((branch:IBranch)=>{
-                        c.branch =  branch.place;
+                await this.getLevelById(obj.level)
+                    .then((level: IClassLevel) => {
+                        c.level = level.name;
+                    }).then(async () => {
+                        await this.getTypeById(obj.type)
+                            .then((type: IClassType) => {
+                                c.type = type.name
+                            })
+                            .then(async () => {
+                                await this.getBranchById(obj.branch)
+                                    .then((branch: IBranch) => {
+                                        c.branch = branch.place;
+                                    })
+                            }).then(() => {
+                                formatedClasses.push(c);
+                            })
                     })
-                }).then(()=>{
-                    formatedClasses.push(c);
-                })
-            })
-            }).then(()=>{
+            }).then(() => {
                 resolve(formatedClasses)
             })
         })
     }
     private getLevel = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         const _id = request.params.id;
-        if(Types.ObjectId.isValid(_id)){
+        if (Types.ObjectId.isValid(_id)) {
             await this.getLevelById(_id)
-            .then((level: IClassLevel) => {
+                .then((level: IClassLevel) => {
                     response.status(200).send(new Response(undefined, level).getData());
                 })
         }
-        else{
+        else {
             next(new SomethingWentWrongException('Wrong ID Format'))
         }
     }
     private getType = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         const _id = request.params.id;
-        if(Types.ObjectId.isValid(_id)){
+        if (Types.ObjectId.isValid(_id)) {
             await this.getTypeById(_id)
-            .then((type: IClassType) => {
+                .then((type: IClassType) => {
                     response.status(200).send(new Response(undefined, type).getData());
                 })
         }
-        else{
+        else {
             next(new SomethingWentWrongException('Wrong ID Format'))
         }
     }
-    private getHistory = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {    
+    private getHistory = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         await refresh(request.user)
-        .then(async (client:IClient) =>{
-            request.user = client;
-            await classModel.find({_id:{$in:request.user.history}})
-            .then(async (classes:IClass[])=>{
-                let returnedClasses = [];
-                await this.formatClasses(classes)
-                .then(formatedClasses=>{
-                    formatedClasses.forEach((c,index) => {
-                        returnedClasses.push(c)
-                        returnedClasses[index].isRated = false;
-                    for(let i=0;i<returnedClasses[index].ratings.length;i++){
-                        if(returnedClasses[index].ratings[i].userID == request.user.id){
-                            returnedClasses[index].isRated = true;
-                            break;
-                        }
-                    }
-                });
+            .then(async (client: IClient) => {
+                request.user = client;
+                await classModel.find({ _id: { $in: request.user.history } })
+                    .then(async (classes: IClass[]) => {
+                        let returnedClasses = [];
+                        await this.formatClasses(classes)
+                            .then(formatedClasses => {
+                                formatedClasses.forEach((c, index) => {
+                                    returnedClasses.push(c)
+                                    returnedClasses[index].isRated = false;
+                                    for (let i = 0; i < returnedClasses[index].ratings.length; i++) {
+                                        if (returnedClasses[index].ratings[i].userID == request.user.id) {
+                                            returnedClasses[index].isRated = true;
+                                            break;
+                                        }
+                                    }
+                                });
+                            })
+                            .then(() => {
+                                response.status(200).send(new Response(undefined, returnedClasses).getData());
+                            })
+                    })
             })
-            .then(()=>{
-                response.status(200).send(new Response(undefined, returnedClasses).getData());
-            })
-        })
-        })
     }
     private getClass = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         const _id = request.params.id;
-        if(Types.ObjectId.isValid(_id)){
+        if (Types.ObjectId.isValid(_id)) {
             await classModel
                 .findById(_id, '-__v -createdAt -updatedAt')
                 .then((classObj: IClass) => {
                     response.status(200).send(new Response(undefined, classObj).getData());
                 })
         }
-        else{
+        else {
             next(new SomethingWentWrongException('Wrong ID Format'))
         }
     }
@@ -220,52 +222,52 @@ class ClassController implements IController {
     }
     private getAllClassesByName = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         const searchName = request.body.name;
-            await classModel
-                .find({ name : new RegExp(searchName,'i'),date: { $gte: new Date()}  }, '-__v -createdAt -updatedAt')
-                .then(async(classes: IClass[]) => {
-                    await this.formatClasses(classes)
-                    .then(formatedClasses=>{
+        await classModel
+            .find({ name: new RegExp(searchName, 'i'), date: { $gte: new Date() } }, '-__v -createdAt -updatedAt')
+            .then(async (classes: IClass[]) => {
+                await this.formatClasses(classes)
+                    .then(formatedClasses => {
                         response.status(200).send(new Response(undefined, formatedClasses).getData());
                     })
-                })
-                .catch(err => {
-                    next(new SomethingWentWrongException(err));
-                })
+            })
+            .catch(err => {
+                next(new SomethingWentWrongException(err));
+            })
     }
     private getAllClassesByFilter = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
-        const filter:ClassFilterDTO =  request.body;
-        let query={};
-        if(filter.levels){
+        const filter: ClassFilterDTO = request.body;
+        let query = {};
+        if (filter.levels) {
             query = {
                 'level': { $in: filter.levels }
             }
         }
-        if(filter.types){
+        if (filter.types) {
             query = {
                 ...query,
                 'type': { $in: filter.types }
             }
         }
-        if(filter.branches){
+        if (filter.branches) {
             query = {
                 ...query,
                 'branch': { $in: filter.branches },
             }
         }
-        query ={
+        query = {
             ...query,
-            'date': { $gte: new Date()} 
+            'date': { $gte: new Date() }
         }
         await classModel.find(query)
-        .then(async(classes:IClass[])=>{
-            await this.formatClasses(classes)
-            .then(formatedClasses=>{
-                response.status(200).send(new Response(undefined, formatedClasses).getData());
+            .then(async (classes: IClass[]) => {
+                await this.formatClasses(classes)
+                    .then(formatedClasses => {
+                        response.status(200).send(new Response(undefined, formatedClasses).getData());
+                    })
             })
-        })
-        .catch(err=>{
-            next(new SomethingWentWrongException(err));
-        })
+            .catch(err => {
+                next(new SomethingWentWrongException(err));
+            })
     }
     private getClassesWithID = async (idArray: string[]): Promise<IClass[]> => {
         return new Promise(async (resolve, reject) => {
@@ -282,9 +284,9 @@ class ClassController implements IController {
         this.getClassesWithID(request.user.reservedClasses)
             .then(async (classes: IClass[]) => {
                 await this.formatClasses(classes)
-                .then(formatedClasses=>{
-                    response.status(200).send(new Response(undefined, formatedClasses).getData());
-                })
+                    .then(formatedClasses => {
+                        response.status(200).send(new Response(undefined, formatedClasses).getData());
+                    })
             })
             .catch(err => {
                 next(new SomethingWentWrongException(err));
@@ -294,9 +296,9 @@ class ClassController implements IController {
         this.getClassesWithID(request.user.likedClasses)
             .then(async (classes: IClass[]) => {
                 await this.formatClasses(classes)
-                .then(formatedClasses=>{
-                    response.status(200).send(new Response(undefined, formatedClasses).getData());
-                })
+                    .then(formatedClasses => {
+                        response.status(200).send(new Response(undefined, formatedClasses).getData());
+                    })
             })
             .catch(err => {
                 next(new SomethingWentWrongException(err));
@@ -310,27 +312,27 @@ class ClassController implements IController {
             .then(async (obj: IClass) => {
                 //class exists , assign to user
                 if (obj) {
-                    if(request.user.reservedClasses.includes(body.id)){
+                    if (request.user.reservedClasses.includes(body.id)) {
                         response.status(200).send(new Response("Class Already Reserved", undefined).getData());
                     }
-                    else if(obj.date< new Date()){
-                        response.status(200).send(new Response(`Class was scheduled on ${obj.date}, which has passed :(`, undefined).getData());    
+                    else if (obj.date < new Date()) {
+                        response.status(200).send(new Response(`Class was scheduled on ${obj.date}, which has passed :(`, undefined).getData());
                     }
-                    else{
+                    else {
                         request.user.reservedClasses.push(body.id);
-                    await request.user.save()
-                        .then(async () => {
-                            obj.users.push(request.user._id)
-                            await obj.save().then(() => {
-                                response.status(200).send(new Response("Reserved Class Sucessfully", undefined).getData());
-                            })
-                                .catch(err => {
-                                    next(new SomethingWentWrongException(err));
+                        await request.user.save()
+                            .then(async () => {
+                                obj.users.push(request.user._id)
+                                await obj.save().then(() => {
+                                    response.status(200).send(new Response("Reserved Class Sucessfully", undefined).getData());
                                 })
-                        })
-                        .catch(err => {
-                            next(new SomethingWentWrongException(err));
-                        })
+                                    .catch(err => {
+                                        next(new SomethingWentWrongException(err));
+                                    })
+                            })
+                            .catch(err => {
+                                next(new SomethingWentWrongException(err));
+                            })
                     }
                 }
                 else {
@@ -349,26 +351,26 @@ class ClassController implements IController {
             .then(async (obj: IClass) => {
                 //class exists , assign to user
                 if (obj) {
-                    if(!request.user.reservedClasses.includes(obj._id)){
+                    if (!request.user.reservedClasses.includes(obj._id)) {
                         next(new SomethingWentWrongException("You didnt reserve for this class"));
                     }
-                    else{
+                    else {
                         const index = request.user.reservedClasses.indexOf(obj._id);
                         request.user.reservedClasses.splice(index, 1);
-                    await request.user.save()
-                        .then(async() => {
-                            const index = obj.users.indexOf(request.user._id);
-                            obj.users.splice(index,1);
-                            await obj.save().then((value:IClass)=>{
-                                response.status(200).send(new Response("Removed Class Reservation Sucessfully", undefined).getData());
+                        await request.user.save()
+                            .then(async () => {
+                                const index = obj.users.indexOf(request.user._id);
+                                obj.users.splice(index, 1);
+                                await obj.save().then((value: IClass) => {
+                                    response.status(200).send(new Response("Removed Class Reservation Sucessfully", undefined).getData());
+                                })
+                                    .catch(err => {
+                                        next(new SomethingWentWrongException(err));
+                                    })
                             })
-                            .catch(err=>{
-                                next(new SomethingWentWrongException(err));        
+                            .catch(err => {
+                                next(new SomethingWentWrongException(err));
                             })
-                        })
-                        .catch(err => {
-                            next(new SomethingWentWrongException(err));
-                        })
                     }
                 }
                 else {
@@ -381,13 +383,13 @@ class ClassController implements IController {
     }
     private getAllClasses = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         await classModel
-            .find({ date: { $gte: new Date()} }, '-__v -createdAt -updatedAt')
+            .find({ date: { $gte: new Date() } }, '-__v -createdAt -updatedAt')
             .then(async (classObj: IClass[]) => {
                 let classes = [];
-                await this.formatClasses(classObj).then(formattedArrays=>{
+                await this.formatClasses(classObj).then(formattedArrays => {
                     formattedArrays.forEach(element => {
                         element.isLiked = false;
-                        if (element.likedUsers.map(user=>user.toString()).includes(request.user.id)) {
+                        if (element.likedUsers.map(user => user.toString()).includes(request.user.id)) {
                             element.isLiked = true
                         }
                         classes.push({ ...element, likedUsers: undefined })
@@ -403,23 +405,23 @@ class ClassController implements IController {
         if (!_id) {
             next(new SomethingWentWrongException("No Class ID Provided"));
         }
-        else if(!Types.ObjectId.isValid(_id)){
-            next(new SomethingWentWrongException("Wrong ID Format"));    
+        else if (!Types.ObjectId.isValid(_id)) {
+            next(new SomethingWentWrongException("Wrong ID Format"));
         }
         else {
             await classModel
                 .findById(_id)
                 .then(async (classObj: IClass) => {
-                    if(classObj){
+                    if (classObj) {
                         const userStatus = classObj.likedUsers.includes(request.user.id);
                         if (status) {
-                            if(!userStatus){
+                            if (!userStatus) {
                                 classObj.numberOfLikes += 1;
-                                classObj.likedUsers.push(user._id); 
+                                classObj.likedUsers.push(user._id);
                             }
                         }
                         else {
-                            if(userStatus){
+                            if (userStatus) {
                                 classObj.numberOfLikes -= 1;
                                 const index = classObj.likedUsers.indexOf(user._id);
                                 classObj.likedUsers.splice(index, 1);
@@ -431,7 +433,7 @@ class ClassController implements IController {
                                 if (status && !userStatus) {
                                     user.likedClasses.push(classObj._id);
                                 }
-                                else if(!status&&userStatus){
+                                else if (!status && userStatus) {
                                     const index = user.likedClasses.indexOf(classObj._id);
                                     user.likedClasses.splice(index, 1);
                                 }
@@ -450,7 +452,7 @@ class ClassController implements IController {
                                 next(new SomethingWentWrongException(err))
                             })
                     }
-                    else{
+                    else {
                         next(new SomethingWentWrongException(`Class with ID ${_id} Not Found`))
                     }
                 })
@@ -460,6 +462,7 @@ class ClassController implements IController {
         }
     }
     private addClass = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+
         if (request.file === undefined) {
             next(new SomethingWentWrongException('Error: No File Selected!'))
         }
@@ -475,35 +478,38 @@ class ClassController implements IController {
 
                     next(new SomethingWentWrongException(errmsg))
                 })
+
+            let pushTokens = await getTokens();
+            SendNotfication(`New ${classInfo.type} Class Available Now!`, `Hurry Up and Reserve Now!`, pushTokens)
         }
     }
     private rateClass = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         const rating: RateClassDTO = request.body;
-         if(request.user.history.includes(rating.id)){
-                await classModel
+        if (request.user.history.includes(rating.id)) {
+            await classModel
                 .findById(rating.id, '-__v -createdAt -updatedAt')
                 .then((classObj: IClass) => {
-                    classObj.ratings.push({rate:rating.rate,feedback:rating.feedback,userID:request.user._id});
-                    let totalRate:number = 0;
-                    for(let i=0;i<classObj.ratings.length;i++){
+                    classObj.ratings.push({ rate: rating.rate, feedback: rating.feedback, userID: request.user._id });
+                    let totalRate: number = 0;
+                    for (let i = 0; i < classObj.ratings.length; i++) {
                         totalRate += classObj.ratings[i].rate;
                     }
-                    totalRate/=classObj.ratings.length;
+                    totalRate /= classObj.ratings.length;
                     classObj.totalRate = Math.ceil(totalRate);
                     classObj.save().then(() => {
                         response.status(200).send(new Response('Rated Class Succesfully', undefined).getData());
                     })
-                    .catch(err=>{
-                        next(new SomethingWentWrongException(err))
-                    })
+                        .catch(err => {
+                            next(new SomethingWentWrongException(err))
+                        })
                 })
-                .catch(err=>{
-                   next(new SomethingWentWrongException(err))
+                .catch(err => {
+                    next(new SomethingWentWrongException(err))
                 })
-            }
-             else{
-                 next(new SomethingWentWrongException("You Didn't Attend The Class Yet"))
-             }
+        }
+        else {
+            next(new SomethingWentWrongException("You Didn't Attend The Class Yet"))
+        }
     }
 }
 export default ClassController;

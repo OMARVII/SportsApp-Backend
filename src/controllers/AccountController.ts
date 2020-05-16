@@ -2,6 +2,7 @@ import * as express from 'express';
 import * as bcrypt from 'bcrypt';
 /////////////////////////////////////////
 import clientModel from '../models/user/Client';
+import pushTokenModel from '../models/PushToken';
 /////////////////////////////////////////
 import IController from '../interfaces/IController';
 import IClient from '../interfaces/user/IClient';
@@ -12,6 +13,7 @@ import authMiddleware from '../middlewares/auth';
 import { ImgUpload } from '../middlewares/Upload';
 ////////////////////////////////////////
 import LogInDto from './../dto/LoginDTO';
+import AddPushTokenDTO from '../dto/AddPushTokenDTO';
 import RegisterDTO from './../dto/RegisterDTO';
 import UpdateClientDTO from './../dto/UpdateClientDTO';
 ////////////////////////////////////////
@@ -40,14 +42,29 @@ class AccountController implements IController {
         ///////////////////////////////////////////////////////////////////////////////////
         this.router.get(`${this.path}/getProfileData`, authMiddleware, this.getProfileData)
         this.router.patch(`${this.path}`, ImgUpload.single('profilePicture'), authMiddleware, validationMiddleware(UpdateClientDTO, true), this.updateAccount);
+        ///////////////////////////////////////////////////////////////////////////////////
+        this.router.post(`${this.path}/addPushToken`, authMiddleware, this.addPushToken);
 
     }
 
+    private addPushToken = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        pushTokenModel
+        const pushTokenhInfo: AddPushTokenDTO = request.body;
+
+        await pushTokenModel
+            .create({ ...pushTokenhInfo })
+            .then((token: AddPushTokenDTO) => {
+                response.status(201).send(new Response('Token Saved', undefined).getData());
+            })
+            .catch(({ error }: any) => {
+                next(new SomethingWentWrongException(error))
+            })
+    }
     private updateAccount = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         let newData: UpdateClientDTO = request.body;
-        const imageURL = "";
-        if (!request.file == undefined) {
-            const imageURL = request.file["location"];
+        let imageURL = "";
+        if (request.file != undefined) {
+            imageURL = request.file["location"];
         }
         newData["profilePicture"] = imageURL;
         let newObj = {};
