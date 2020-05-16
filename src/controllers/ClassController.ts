@@ -41,7 +41,7 @@ class ClassController implements IController {
         this.router = express.Router();
         this.initializeRoutes();
     }
-    private initializeRoutes() {
+    public initializeRoutes() {
         this.router.get(`${this.path}/AllClasses`, authMiddleware, this.getAllClasses);
         this.router.get(`${this.path}/ClassLevels`, authMiddleware, this.getClassLevels);
         this.router.get(`${this.path}/ClassTypes`, authMiddleware, this.getClassTypes);

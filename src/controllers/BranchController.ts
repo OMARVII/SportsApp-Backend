@@ -23,7 +23,7 @@ class BranchController implements IController {
         this.router = express.Router();
         this.initializeRoutes();
     }
-    private initializeRoutes() {
+    public initializeRoutes() {
         this.router.post(`${this.path}`, validationMiddleware(AddBranchDTO), this.addBranch);
         //////////////////////////////////////////////////////////////////////////////////
         this.router.get(`${this.path}/AllBranches`, authMiddleware, this.getAllBranches)

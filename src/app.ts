@@ -6,11 +6,11 @@ import errorMiddleware from './middlewares/ErrorMiddleware';
 import * as swaggerUi from 'swagger-ui-express';
 import * as swaggerDocument from '../swagger.json';
 class App {
-
+    private static appInstance : App;
     private app: express.Application;
     private PORT: any;
 
-    constructor(controllers: IController[]) {
+    private constructor(controllers: IController[]) {
 
         this.app = express();
         this.PORT = process.env.PORT || 5000;
@@ -25,6 +25,12 @@ class App {
         this.app.use("/", swaggerUi.serve,swaggerUi.setup(swaggerDocument));
 
         this.initializeErrorHandling();
+    }
+    public static getInstance(controllers: IController[]):App{
+        if(!App.appInstance){
+            App.appInstance = new App(controllers);
+        }
+        return App.appInstance;
     }
 
     private initializeMiddlewares() {

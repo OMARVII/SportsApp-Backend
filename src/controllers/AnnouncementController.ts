@@ -24,7 +24,7 @@ class AnnouncementController implements IController {
         this.router = express.Router();
         this.initializeRoutes();
     }
-    private initializeRoutes() {
+    public initializeRoutes() {
         this.router.post(`${this.path}`, ImgUpload.single('announcementImage'), validationMiddleware(AddAnnouncementDTO), this.addAnnouncement);
         //////////////////////////////////////////////////////////////////////////////////
         this.router.get(`${this.path}/AllAnnouncements`, authMiddleware, this.getAllAnnouncements)

@@ -11,7 +11,7 @@ import AdminController from './controllers/AdminController'
 
 validateEnv();
 
-const app = new App(
+const app = App.getInstance(
     [
         new AccountController(),
         new ClassController(),

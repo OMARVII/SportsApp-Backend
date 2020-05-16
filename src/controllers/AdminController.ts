@@ -30,7 +30,7 @@ class AccountController implements IController {
         this.tokenManager = new TokenManager();
         this.initializeRoutes();
     }
-    private initializeRoutes() {
+    public initializeRoutes() {
         this.router.post(`${this.path}/Login`, validationMiddleware(LogInDto), this.login);
         this.router.post(`${this.path}/Register`, validationMiddleware(RegisterDTO), this.register);
     }

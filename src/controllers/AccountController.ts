@@ -34,7 +34,7 @@ class AccountController implements IController {
         this.tokenManager = new TokenManager();
         this.initializeRoutes();
     }
-    private initializeRoutes() {
+    public initializeRoutes() {
         this.router.get(`${this.path}/ValidateToken`, authMiddleware, this.validateToken);
         ///////////////////////////////////////////////////////////////////////////////////
         this.router.post(`${this.path}/Login`, validationMiddleware(LogInDto), this.login);
