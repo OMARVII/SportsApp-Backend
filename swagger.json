@@ -959,13 +959,13 @@
                 "produces": [
                     "application/json"
                 ],
-                "requestBody":{
-                    "content":{
-                        "application/json":{
-                            "schema":{
-                                "properties":{
-                                    "name":{
-                                        "type":"string"
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
                                     }
                                 }
                             }
@@ -1100,20 +1100,20 @@
                                 "properties": {
                                     "types": {
                                         "type": "array",
-                                        "items":{
-                                            "type":"string"
+                                        "items": {
+                                            "type": "string"
                                         }
                                     },
                                     "levels": {
                                         "type": "array",
-                                        "items":{
-                                            "type":"string"
+                                        "items": {
+                                            "type": "string"
                                         }
                                     },
                                     "branches": {
                                         "type": "array",
-                                        "items":{
-                                            "type":"string"
+                                        "items": {
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -1659,18 +1659,7 @@
                                     "type": "string"
                                 },
                                 "birthDate": {
-                                    "type": "object",
-                                    "properties": {
-                                        "day": {
-                                            "type": "number"
-                                        },
-                                        "month": {
-                                            "type": "number"
-                                        },
-                                        "year": {
-                                            "type": "number"
-                                        }
-                                    }
+                                    "type": "string"
                                 },
                                 "email": {
                                     "type": "string"
@@ -1818,18 +1807,7 @@
                     "type": "string"
                 },
                 "birthDate": {
-                    "type": "object",
-                    "properties": {
-                        "day": {
-                            "type": "number"
-                        },
-                        "month": {
-                            "type": "number"
-                        },
-                        "year": {
-                            "type": "number"
-                        }
-                    }
+                    "type": "string"
                 },
                 "profilePicture": {
                     "type": "string",
