@@ -5,11 +5,7 @@ interface IUser extends Document {
     fullName: string;
     email: string;
     password: string;
-    birthDate: {
-        day: number,
-        month: number,
-        year: number
-    };
+    birthDate: string;
     gender: string;
     mobile: string;
 
