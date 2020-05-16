@@ -39,30 +39,29 @@ class AccountController implements IController {
         this.router.post(`${this.path}/Register`, validationMiddleware(RegisterDTO), this.register);
         ///////////////////////////////////////////////////////////////////////////////////
         this.router.get(`${this.path}/getProfileData`, authMiddleware, this.getProfileData)
-        this.router.patch(`${this.path}`, ImgUpload.single('profilePicture'), authMiddleware, validationMiddleware(UpdateClientDTO,true), this.updateAccount);
+        this.router.patch(`${this.path}`, ImgUpload.single('profilePicture'), authMiddleware, validationMiddleware(UpdateClientDTO, true), this.updateAccount);
 
     }
 
     private updateAccount = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         let newData: UpdateClientDTO = request.body;
-        if(request.file == undefined){
-            next(new SomethingWentWrongException("No File Selected"))
-        }
-        else{
+        const imageURL = "";
+        if (!request.file == undefined) {
             const imageURL = request.file["location"];
-            newData["profilePicture"] = imageURL;
-            let newObj = {};
-            Object.keys(newData).forEach((prop) => {
-                if (newData[prop]) { newObj[prop] = newData[prop]; }
-            });
-            try {
-                let newUser = await clientModel.findByIdAndUpdate(request.user._id, { $set: newObj });
-                response.status(200).send(new Response('Updated Successfuly!').getData());
-            }
-            catch {
-                next(new SomethingWentWrongException());
-            }
         }
+        newData["profilePicture"] = imageURL;
+        let newObj = {};
+        Object.keys(newData).forEach((prop) => {
+            if (newData[prop]) { newObj[prop] = newData[prop]; }
+        });
+        try {
+            let newUser = await clientModel.findByIdAndUpdate(request.user._id, { $set: newObj });
+            response.status(200).send(new Response('Updated Successfuly!').getData());
+        }
+        catch {
+            next(new SomethingWentWrongException());
+        }
+
     }
     private validateToken = async (quest: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
         response.status(200).send(new Response(undefined, { result: true }).getData());
@@ -120,7 +119,6 @@ class AccountController implements IController {
         }
     }
     private getProfileData = async (request: IRequestWithUser, response: express.Response, next: express.NextFunction) => {
-        console.log("ee")
 
         let account: IClient = await clientModel.findById(request.user._id, ' -password -_id -createdAt -updatedAt -__v');
         let returnedAccount = account.toObject();
